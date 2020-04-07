@@ -46,7 +46,7 @@ categories: 学习笔记
 　　< version> < status> < reason-phrase>   
 　　< headers>  
 　　< entity-body>  
-　　例如:访问http://blog.owlslink.xyz ,在谷歌浏览器中查看请求报文头部:  
+　　例如:访问http://owlsn.github.io/blog ,在谷歌浏览器中查看请求报文头部:  
 ![](https://raw.githubusercontent.com/owlsn/blog/master/source/source/request_header.png)  
 　　查看响应报文头部:  
 ![](https://raw.githubusercontent.com/owlsn/blog/master/source/source/response_header.png)  

@@ -86,8 +86,8 @@ double_encode | 可选 | 布尔值。规定了是否编码已存在的 HTML 实�
 	}  
 </code>
 　　这种方法有一个问题就是对于单引号`'`和双引号`"`不会进行转义处理,对于这种方法使用的时候就要非常注意了。  
-　　比如转义<a href="http://blog.owlslink.xyz"></a>,用第一种方法:  
-　　`&lt;a href=&quot;http://blog.owlslink.xyz&quot;&gt;&lt;/a&gt;`  
+　　比如转义<a href="http://owlsn.github.io/blog"></a>,用第一种方法:  
+　　`&lt;a href=&quot;http://owlsn.github.io/blog&quot;&gt;&lt;/a&gt;`  
 　　第二种方法:  
-　　`&lt;a href="http://blog.owlslink.xyz"&gt;&lt;/a&gt;`  
+　　`&lt;a href="http://owlsn.github.io/blog"&gt;&lt;/a&gt;`  
 　　虽然第二种方法看起来简洁,但是在一些特殊情况下是会出现问题的,总之我还是比较倾向于使用第一种用正则匹配的方法,根据实际情况可以自己控制需要转换的实体。
