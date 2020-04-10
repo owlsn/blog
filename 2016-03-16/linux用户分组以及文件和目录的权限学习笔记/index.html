@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    
+
+    
+    <title>linux用户分组以及文件和目录的权限学习笔记 | owlsn&#39;s blog</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="keywords" content="linux" />
+    
+    <meta name="description" content="写在前面　　linux分组权限管理在实际工作中会经常遇到,这篇文章我主要是对一些命令和概念进行了总结罗列,方便记忆。   用户和组相关的配置文件　　1. &#x2F;etc&#x2F;passwd　　系统用户配置文件，是用户管理中最重要的一个文件。这个文件记录了Linux系统中每个用户的一些基本属性，并且对所有用户可读。　　&#x2F;etc&#x2F;passwd中每一行记录对应一个用户，每行记录又被冒号分割，其格式和具体含义如下：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux用户分组以及文件和目录的权限学习笔记">
+<meta property="og:url" content="https://owlsn.github.io/blog/2016-03-16/linux%E7%94%A8%E6%88%B7%E5%88%86%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95%E7%9A%84%E6%9D%83%E9%99%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="owlsn&#39;s blog">
+<meta property="og:description" content="写在前面　　linux分组权限管理在实际工作中会经常遇到,这篇文章我主要是对一些命令和概念进行了总结罗列,方便记忆。   用户和组相关的配置文件　　1. &#x2F;etc&#x2F;passwd　　系统用户配置文件，是用户管理中最重要的一个文件。这个文件记录了Linux系统中每个用户的一些基本属性，并且对所有用户可读。　　&#x2F;etc&#x2F;passwd中每一行记录对应一个用户，每行记录又被冒号分割，其格式和具体含义如下：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/authority.png">
+<meta property="article:published_time" content="2016-03-16T07:37:50.000Z">
+<meta property="article:modified_time" content="2020-04-07T06:39:44.309Z">
+<meta property="article:author" content="owlsn">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/authority.png">
+    
+
+    
+
+    
+
+    
+<link rel="stylesheet" href="/blog/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/blog/libs/titillium-web/styles.css">
+
+    
+<link rel="stylesheet" href="/blog/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/blog/css/style.css">
+
+
+    
+<script src="/blog/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/blog/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/blog/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/blog/" class="logo"></a>
+                    </h1>
+                    
+                        <h2 class="subtitle-wrap">
+                            <p class="subtitle">owlsn&#39;s blog</p>
+                        </h2>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/">Home</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/">个人开发</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/">个人心得</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E5%85%B4%E8%B6%A3%E7%88%B1%E5%A5%BD/">兴趣爱好</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">思维导图</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E6%80%BB%E7%BB%93%E8%A7%84%E5%88%92/">总结规划</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E6%96%87%E7%AB%A0%E8%BD%AC%E8%BD%BD/">文章转载</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a></li><li class="main-nav-list-item"><a class="main-nav-list-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a></li></ul>
+                                    
+                                <li class="main-nav-list-item" >
+                                    <a class="main-nav-list-link" href="/blog/about/index.html">About</a>
+                                </li>
+                            
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/blog/',
+        CONTENT_URL: '/blog/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/blog/js/insight.js"></script>
+
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-linux用户分组以及文件和目录的权限学习笔记" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        linux用户分组以及文件和目录的权限学习笔记
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+      <i class="fa fa-calendar"></i>
+      <a href="/blog/2016-03-16/linux%E7%94%A8%E6%88%B7%E5%88%86%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95%E7%9A%84%E6%9D%83%E9%99%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="article-date">
+         <time datetime="2016-03-16T07:37:50.000Z" itemprop="datePublished">2016-03-16</time>
+      </a>
+    </div>
+
+
+                
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/blog/tags/linux/" rel="tag">linux</a>
+    </div>
+
+                
+
+                
+
+            </div>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+            <h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>　　linux分组权限管理在实际工作中会经常遇到,这篇文章我主要是对一些命令和概念进行了总结罗列,方便记忆。  </p>
+<h3 id="用户和组相关的配置文件"><a href="#用户和组相关的配置文件" class="headerlink" title="用户和组相关的配置文件"></a>用户和组相关的配置文件</h3><p>　　1. /etc/passwd<br>　　系统用户配置文件，是用户管理中最重要的一个文件。这个文件记录了Linux系统中每个用户的一些基本属性，并且对所有用户可读。<br>　　/etc/passwd中每一行记录对应一个用户，每行记录又被冒号分割，其格式和具体含义如下：<br>　　用户名:口令:用户标识号:组标识号:注释性描述:主目录:默认shell<br>　　例如:<code>root:x:0:0:root:/root:/bin/bash</code><br>　　　　- 用户名：是代表用户账号的字符串<br>　　　　- 口令：存放着加密后的用户口令<br>　　　　- 用户标识号：就是用户的UID<br>　　　　- 组标识号：就是组的GID<br>　　　　- 注释性描述：字段是对用户的描述信息<br>　　　　- 主目录：也就是用户登录到系统之后默认所处的目录<br>　　　　- 默认shell：就是用户登录系统后默认使用的命令解释器<br>　　2. /etc/shadow文件<br>　　用户密码文件，由于/etc/passwd文件是所有用户都可读的，这样就导致了用户的密码容易出现泄露，因此，linux将用户的密码信息从/etc/passwd中分离出来，单独的放到了一个文件中，这个文件就是/etc/shadow，该文件只有root用户拥有读权限，从而保证了用户密码的安全性。<br>　　/etc/shadow文件内容的格式：<br>　　用户名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:保留字段<br>　　例如:<code>root:$1$S4xQtnCs$6KteE0/CWlqWrq5.5i9Rc/:16875:0:99999:7:::</code><br>　　　　- 用户名：是代表用户账号的字符串<br>　　　　- 加密口令：存放的是加密后的用户口令字串，如果此字段是“*”、“!”、“x”等字符，则对应的用户不能登录系统<br>　　　　- 最后一次修改时间：表示从某个时间起，到用户最近一次修改口令的间隔天数<br>　　　　- 最小时间间隔：表示两次修改密码之间的最小时间间隔<br>　　　　- 最大时间间隔：表示两次修改密码之间的最大时间间隔，这个设置能增强管理员管理用户的时效性<br>　　　　- 警告时间：表示从系统开始警告用户到密码正式失效之间的天数<br>　　　　- 不活动时间：此字段表示用户口令作废多少天后，系统会禁用此用户，也就是说系统不再让此用户登录，也不会提示用户过期，是完全禁用<br>　　　　- 失效时间：表示该用户的帐号生存期，超过这个设定时间，帐号失效，用户就无法登录系统了。如果这个字段的值为空，帐号永久可用<br>　　　　- 保留字段：linux的保留字段，目前为空，以备linux日后发展之用<br>　　3. /etc/group文件<br>　　用户组配置文件，用户组的所有信息都存放在此文件中。<br>　　/etc/group文件内容的格式：<br>　　组名:口令:组标识号:组内用户列表<br>　　例如:<code>bin:x:1:bin,daemon</code><br>　　　　- 组名：是用户组的名称，由字母或数字构成<br>　　　　- 口令：存放的是用户组加密后的口令字串，密码默认设置在/etc/gshadow文件中，而在这里用“x”代替，linux系统下默认的用户组都没有口令，可以通过gpasswd来给用户组添加密码<br>　　　　- 组标识号：就是组的GID<br>　　　　- 组内用户列表： 显示属于这个组的所有用户，多个用户之间用逗号分隔<br>　　4. /etc/login.defs文件<br>　　用来定义创建一个用户时的默认设置，比如指定用户的UID和GID的范围，用户的过期时间、是否需要创建用户主目录等等<br>　　5. /etc/default/useradd文件<br>　　通过useradd命令不加任何参数创建一个用户是的默认配置<br>　　6. /etc/skel目录<br>　　新建立的用户在主目录下默认拥有自己指定的配置文件</p>
+<h3 id="用户和组管理"><a href="#用户和组管理" class="headerlink" title="用户和组管理"></a>用户和组管理</h3><h4 id="添加、修改和删除用户命令useradd-usermod-userdel"><a href="#添加、修改和删除用户命令useradd-usermod-userdel" class="headerlink" title="添加、修改和删除用户命令useradd/usermod/userdel"></a>添加、修改和删除用户命令useradd/usermod/userdel</h4><p>　　1. useradd<br>　　useradd不加任何参数创建用户时，系统首先读取添加用户配置文件/etc/login.defs和/etc/default/useradd，根据这两个配置文件中定义的规则添加用户，然后会向/etc/passwd和/etc/group文件添加用户和用户组记录，同时/etc/passwd和/etc/group对应的加密文件也会自动生成记录，接着系统会自动在/etc/default/useradd文件设定的目录下建立用户主目录，最后复制/etc/skel目录中的所有文件到新用户的主目录中，这样一个新的用户就建立完成了<br>　　　　- 使用语法<code>useradd [-option] name</code><br>　　　　- 常用参数<br>　　　　　　- -u uid：即用户标识号，此标识号必须唯一。<br>　　　　　　- -U user-group:创建一个与用户同名的分组,并将此用户加入分组。<br>　　　　　　- -g group：指定新建用户登录时所属的默认组，或者叫主组。此群组必须已经存在。<br>　　　　　　- -G group：指定新建用户的附加组，此群组必须已经存在。附加组是相对与主组而言的，当一个用户同时是多个组中的成员时，登录时的默认组成为主组，而其它组称为附加组。<br>　　　　　　- -c comment：对新建用户的说明信息。<br>　　　　　　- -p password：设置登录口令<br>　　　　　　- name：指定需要创建的用户名。<br>　　2. usermod<br>　　usermod修改一个用户的属性,usermod命令接的参数和useradd接的参数很多都是类似的。<br>　　　　- 使用语法<code>usermod [-option] name</code><br>　　　　- 常用参数<br>　　　　　　- -a -G append group：添加用户所属分组,如果只有-G参数的话,该用户会从原来所属分组删除的。<br>　　3. userdel<br>　　Userdel用来删除一个用户。<br>　　　　- 使用语法 <code>userdel [-option] name</code><br>　　　　- 常用参数<br>　　　　　　- -f force：强制删除<br>　　　　　　- -r remove：删除用户主目录下的文件以及主目录本身<br>　　4. passwd<br>　　修改用户的认证口令。</p>
+<h4 id="添加、切换、删除用户组命令groupadd-newgrp-groupdel"><a href="#添加、切换、删除用户组命令groupadd-newgrp-groupdel" class="headerlink" title="添加、切换、删除用户组命令groupadd/newgrp/groupdel"></a>添加、切换、删除用户组命令groupadd/newgrp/groupdel</h4><p>　　1. groupadd<br>　　添加一个分组<br>　　2. newgrp<br>　　切换用户组,需要先用gpasswd为group添加密码。<br>　　3. groupdel<br>　　删除一个用户组,若用户组下存在用户,需要先删除用户才能删除该组  </p>
+<h3 id="文件与目录的权限"><a href="#文件与目录的权限" class="headerlink" title="文件与目录的权限"></a>文件与目录的权限</h3><h4 id="查看文件与目录的权限ls-al"><a href="#查看文件与目录的权限ls-al" class="headerlink" title="查看文件与目录的权限ls -al"></a>查看文件与目录的权限ls -al</h4><p>　　例如:  </p>
+<pre><code>[root@localhost c]#ls -al
+total 20
+drwxr-xr-x.  2 root root 4096 Mar 30 09:45 .
+drwxr-xr-x. 14 root root 4096 Apr  6 02:29 ..
+-rwxr-xr-x.  1 root root 6504 Mar 30 08:51 a.out
+-rw-r--r--.  1 root root  177 Mar 30 08:51 helloworld.c  
+</code></pre><p>　　- 上面字段解释(图来自《鸟哥的linux私房菜》)<br>　　<img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/authority.png" alt="">　　</p>
+<p>　　- 权限字段解释<br>　　<img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/authority_properties.png" alt=""></p>
+<h4 id="修改权限"><a href="#修改权限" class="headerlink" title="修改权限"></a>修改权限</h4><p>　　1. 改变所属群组, chgrp;分组必须存在。<br>　　<code>chgrp [-option] group filename/dirname</code>,<br>　　2. 改变档案拥有者, chown;用户必须存在。<br>　　<code>chown [-option] owner filename/dirname</code><br>　　3. 改变权限属性, chmod;<br>　　　　- <code>chmod [-option] xyz filename/dirname</code>  </p>
+<table>
+<thead>
+<tr>
+<th>chmod</th>
+<th>u<br>g<br>o<br>a</th>
+<th>+(加入)<br>-(除去)<br>=(设定)</th>
+<th>r<br>w<br>x</th>
+<th>档案或目录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="目录权限属性"><a href="#目录权限属性" class="headerlink" title="目录权限属性"></a>目录权限属性</h4><p>　　1. r (read contents in directory)： 表示具有读取目录结构列表的权限，所以当您具有读取 (r) 一个目录的权限时， 您就可以利用 ls 这个指令将该目录的内容列表显示出来！<br>　　2. w (modify contents of directory)： 他表示您将具有改动该目录结构列表的权限，也就是底下这些权限：<br>　　　　- 建立新的档案与目录；<br>　　　　- 删除已经存在的档案与目录(不论该档案是属于谁的！)<br>　　　　- 将已存在的档案或目录进行更名；<br>　　　　- 搬移该目录内的档案、目录位置。<br>　　3. x (access directory)： 是否能将工作目录改为该目录。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>　　《鸟哥的linux私房菜》</p>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="https://owlsn.github.io/blog/2016-03-16/linux%E7%94%A8%E6%88%B7%E5%88%86%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95%E7%9A%84%E6%9D%83%E9%99%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-id="ck8tx1e2c0026gproa8w4bkyx" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "owlsn"
+        },
+        "headline": "linux用户分组以及文件和目录的权限学习笔记",
+        "image": "https://owlsn.github.io/bloghttps://raw.githubusercontent.com/owlsn/blog/master/source/source/authority.png",
+        "keywords": "linux",
+        "genre": "学习笔记",
+        "datePublished": "2016-03-16",
+        "dateCreated": "2016-03-16",
+        "dateModified": "2020-04-07",
+        "url": "https://owlsn.github.io/blog/2016-03-16/linux用户分组以及文件和目录的权限学习笔记/",
+        "description": "写在前面　　linux分组权限管理在实际工作中会经常遇到,这篇文章我主要是对一些命令和概念进行了总结罗列,方便记忆。  
+用户和组相关的配置文件　　1. /etc/passwd　　系统用户配置文件，是用户管理中最重要的一个文件。这个文件记录了Linux系统中每个用户的一些基本属性，并且对所有用户可读。　　/etc/passwd中每一行记录对应一个用户，每行记录又被冒号分割，其格式和具体含义如下：　",
+        "wordCount": 208
+    }
+</script>
+
+</article>
+
+    <section id="comments">
+    
+        
+<div id="comment-container"></div>
+
+
+    
+    </section>
+
+
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>follow:</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/owlsn" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/blog/2016-03-17/nginx%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="article-nav-newer" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">newer</strong>
+        <p class="article-nav-title">
+        
+            nginx编译安装与配置学习笔记
+        
+        </p>
+        <i class="icon fa fa-chevron-right" id="icon-chevron-right"></i>
+    </a>
+    
+    
+        <a href="/blog/2016-03-15/%E4%BD%BF%E7%94%A8memcached%E6%88%96%E8%80%85redis%E5%AD%98%E5%82%A8session/" id="article-nav-older" class="article-nav-link-wrap">
+        <strong class="article-nav-caption">older</strong>
+        <p class="article-nav-title">使用memcached或者redis存储session</p>
+        <i class="icon fa fa-chevron-left" id="icon-chevron-left"></i>
+        </a>
+    
+</nav>
+
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">recents</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/blog/2020-04-10/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97-1/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a></p>
+                            <p class="item-title"><a href="/blog/2020-04-10/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97-1/" class="title">推荐系统系列(1)</a></p>
+                            <p class="item-date"><time datetime="2020-04-10T08:07:04.000Z" itemprop="datePublished">2020-04-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/blog/2020-01-01/sketch%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E5%92%8C%E8%B7%AF%E5%BE%84%E5%89%AA%E5%88%87/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://raw.githubusercontent.com/owlsn/blog/master/source/source/origin.jpg)" alt="sketch布尔运算和路径剪切" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a></p>
+                            <p class="item-title"><a href="/blog/2020-01-01/sketch%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E5%92%8C%E8%B7%AF%E5%BE%84%E5%89%AA%E5%88%87/" class="title">sketch布尔运算和路径剪切</a></p>
+                            <p class="item-date"><time datetime="2020-01-01T07:45:10.000Z" itemprop="datePublished">2020-01-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/blog/2019-12-07/protobuf%E5%AE%9E%E8%B7%B5/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p>
+                            <p class="item-title"><a href="/blog/2019-12-07/protobuf%E5%AE%9E%E8%B7%B5/" class="title">protobuf实践</a></p>
+                            <p class="item-date"><time datetime="2019-12-07T08:21:30.000Z" itemprop="datePublished">2019-12-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/blog/2019-12-03/%E6%8E%A8%E8%8D%90%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a></p>
+                            <p class="item-title"><a href="/blog/2019-12-03/%E6%8E%A8%E8%8D%90%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="title">推荐技术分享</a></p>
+                            <p class="item-date"><time datetime="2019-12-03T10:44:31.000Z" itemprop="datePublished">2019-12-03</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/blog/2019-11-30/bazel%E5%AE%9E%E8%B7%B5/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p>
+                            <p class="item-title"><a href="/blog/2019-11-30/bazel%E5%AE%9E%E8%B7%B5/" class="title">bazel实践</a></p>
+                            <p class="item-date"><time datetime="2019-11-30T08:07:58.000Z" itemprop="datePublished">2019-11-30</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">categories</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/">个人开发</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/">个人心得</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B4%E8%B6%A3%E7%88%B1%E5%A5%BD/">兴趣爱好</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">思维导图</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E7%BB%93%E8%A7%84%E5%88%92/">总结规划</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%96%87%E7%AB%A0%E8%BD%AC%E8%BD%BD/">文章转载</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/12/">December 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/11/">November 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/10/">October 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/06/">June 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/11/">November 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/10/">October 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/05/">May 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/04/">April 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/03/">March 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/02/">February 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/12/">December 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/03/">March 2016</a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IPFS/" rel="tag">IPFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/c/" rel="tag">c</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cgi/" rel="tag">cgi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cookie/" rel="tag">cookie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cpp/" rel="tag">cpp</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/github/" rel="tag">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/go/" rel="tag">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/hexo/" rel="tag">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/html/" rel="tag">html</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/http/" rel="tag">http</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/java/" rel="tag">java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/js/" rel="tag">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/linux/" rel="tag">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/memcached/" rel="tag">memcached</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongo/" rel="tag">mongo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongodb/" rel="tag">mongodb</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/photoshop/" rel="tag">photoshop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/php/" rel="tag">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/python/" rel="tag">python</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/redis/" rel="tag">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/session/" rel="tag">session</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sketch/" rel="tag">sketch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sql/" rel="tag">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/web%E5%89%8D%E7%AB%AF/" rel="tag">web前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" rel="tag">个人开发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%A7%E5%93%81/" rel="tag">产品</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" rel="tag">推荐系统</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%A7%84%E5%88%92/" rel="tag">规划</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a><span class="tag-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/blog/tags/IPFS/" style="font-size: 10px;">IPFS</a> <a href="/blog/tags/c/" style="font-size: 10px;">c</a> <a href="/blog/tags/cgi/" style="font-size: 10px;">cgi</a> <a href="/blog/tags/cookie/" style="font-size: 10px;">cookie</a> <a href="/blog/tags/cpp/" style="font-size: 16px;">cpp</a> <a href="/blog/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/blog/tags/github/" style="font-size: 10px;">github</a> <a href="/blog/tags/go/" style="font-size: 10px;">go</a> <a href="/blog/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/blog/tags/html/" style="font-size: 10px;">html</a> <a href="/blog/tags/http/" style="font-size: 14px;">http</a> <a href="/blog/tags/java/" style="font-size: 10px;">java</a> <a href="/blog/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/blog/tags/js/" style="font-size: 12px;">js</a> <a href="/blog/tags/linux/" style="font-size: 10px;">linux</a> <a href="/blog/tags/memcached/" style="font-size: 12px;">memcached</a> <a href="/blog/tags/mongo/" style="font-size: 12px;">mongo</a> <a href="/blog/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/blog/tags/mysql/" style="font-size: 12px;">mysql</a> <a href="/blog/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/blog/tags/photoshop/" style="font-size: 10px;">photoshop</a> <a href="/blog/tags/php/" style="font-size: 20px;">php</a> <a href="/blog/tags/python/" style="font-size: 12px;">python</a> <a href="/blog/tags/redis/" style="font-size: 12px;">redis</a> <a href="/blog/tags/session/" style="font-size: 12px;">session</a> <a href="/blog/tags/shell/" style="font-size: 10px;">shell</a> <a href="/blog/tags/sketch/" style="font-size: 10px;">sketch</a> <a href="/blog/tags/sql/" style="font-size: 10px;">sql</a> <a href="/blog/tags/web%E5%89%8D%E7%AB%AF/" style="font-size: 10px;">web前端</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" style="font-size: 10px;">个人开发</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 12px;">个人总结</a> <a href="/blog/tags/%E4%BA%A7%E5%93%81/" style="font-size: 10px;">产品</a> <a href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 10px;">多进程</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">学习笔记</a> <a href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" style="font-size: 12px;">推荐系统</a> <a href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 18px;">机器学习</a> <a href="/blog/tags/%E8%A7%84%E5%88%92/" style="font-size: 10px;">规划</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 12px;">设计模式</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io" target="_blank" rel="noopener">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/blog/" class="logo"></a>
+                </h1>
+                <p>&copy; 2020 owlsn</p>
+                
+                <p>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="https://github.com/ppoffice" target="_blank">PPOffice</a></p>
+                
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+        
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+    var gitalk = new Gitalk({
+        clientID: '1074d54b0ab4d7f69a29',
+        clientSecret: 'd2e45265dbc2c8bd2ed83cc2310102b0036361df',
+        id: '8d6479766dd45cb9ed60ecaa960c01af',
+        repo: 'blog',
+        owner: 'owlsn',
+        admin: "owlsn"
+    })
+    gitalk.render('comment-container')
+</script>
+
+
+
+
+
+    
+        
+<script src="/blog/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/blog/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/blog/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/blog/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

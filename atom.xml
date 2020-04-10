@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>owlsn&#39;s blog</title>
+  
+  <subtitle>owlsn&#39;s blog</subtitle>
+  <link href="/blog/atom.xml" rel="self"/>
+  
+  <link href="https://owlsn.github.io/blog/"/>
+  <updated>2020-04-10T08:07:45.372Z</updated>
+  <id>https://owlsn.github.io/blog/</id>
+  
+  <author>
+    <name>owlsn</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>推荐系统系列(1)</title>
+    <link href="https://owlsn.github.io/blog/2020-04-10/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97-1/"/>
+    <id>https://owlsn.github.io/blog/2020-04-10/推荐系统系列-1/</id>
+    <published>2020-04-10T08:07:04.000Z</published>
+    <updated>2020-04-10T08:07:45.372Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="推荐系统" scheme="https://owlsn.github.io/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/"/>
+    
+    
+      <category term="推荐系统" scheme="https://owlsn.github.io/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>sketch布尔运算和路径剪切</title>
+    <link href="https://owlsn.github.io/blog/2020-01-01/sketch%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E5%92%8C%E8%B7%AF%E5%BE%84%E5%89%AA%E5%88%87/"/>
+    <id>https://owlsn.github.io/blog/2020-01-01/sketch布尔运算和路径剪切/</id>
+    <published>2020-01-01T07:45:10.000Z</published>
+    <updated>2020-04-07T06:39:44.314Z</updated>
+    
+    <content type="html"><![CDATA[<p>sketch中提供了布尔运算的功能，就是将几个简单图形组合成复杂图形，路径操作就是对图形上的锚点进行一些操作，一开始学习使用过程中使用这两个功能有遇到几个小问题。这里做一下记录总结。<br><a id="more"></a></p><h3 id="布尔运算"><a href="#布尔运算" class="headerlink" title="布尔运算"></a>布尔运算</h3><ul><li>合并形状 (Union)：合并的结果是会得到两个矢量区域的总和。   </li><li>减去顶层形状 (Subtract)：这一项的结果是顶层矢量的区域会从下一层的图形上移去。  </li><li>与形状区域相交 (Intersect)：与形状区域相交的结果是会保留原图形重叠的部分。  </li><li>排除重叠形状 (Difference)：排除重叠形状的结果是只保留原图形不重叠的部分，它是“与形状区域相交”这一运算的反向。 </li></ul><p>问题来了，这里所说的几个布尔操作，并没有说详细说清楚填充和边界的问题，这里我经过几个测试后得到一些结论，就是union会将两个图形的边界都合并，而在公共部分内部的边界就会被覆盖了，边界继承的是底层图形的边界；substract是顶层的图形从下一层图形移走之后，下一层图形与顶层图形的边界地方，就会形成下一层图形的边界，边界的宽度和下一层图形的边界设定相同；intersect和difference同理，都是以下一层图形的边界和区域为准，如下图：<br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/origin.jpg' width='200px' heigth='200px' alt='origin'><br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/union.jpg' width='200px' heigth='200px' alt='union'><br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/subtract.jpg' width='200px' heigth='200px' alt='subtract'><br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/intersect.jpg' width='200px' heigth='200px' alt='intersect'><br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/difference.jpg' width='200px' heigth='200px' alt='difference'></p><h3 id="paths"><a href="#paths" class="headerlink" title="paths"></a>paths</h3><p>路径和锚点是联系在一起的，基础图形上都有一些锚点，比如正方形是4个顶点，圆形是上下左右四个点，这些点沿着图形的边就是路径，锚点可以通过编辑来增加新的点，因此路径也可以增加，当路径被剪刀工具去掉的时候，图形就不在是封闭的了，这个时候剪的是路径，沿线的border也会被剪掉。   </p><h3 id="问题出现"><a href="#问题出现" class="headerlink" title="问题出现"></a>问题出现</h3><p>这里我想画个半圆弧，作为声音图标的右边部分，先画了一个圆，只取border，去掉了fill部分，然后右边用正方形覆盖，布尔运算取subtract，这个时候半圆就会生成竖线的边，按照道理，然后用剪刀工具把这条边剪掉，就是半圆弧了，但是这个时候，剪刀工具居然发现这条竖线没有路径，不能剪掉，按照道理来说，路径都没有为什么会有border呢，<br><img src='https://raw.githubusercontent.com/owlsn/blog/master/source/source/no_path.jpg' width='200px' heigth='200px' alt='no_path'></p><p>然后我再仔细看了，发现可能是图层上下的关系。  </p><ul><li>正方形在上，圆在下，取subtract，这个时候没有路径   </li><li>正方形在下，圆在上，取intersect，这个时候有路径，虽然半圆是反过来的</li></ul><p>而且应该和布尔运算也有关系，因为布尔运算主要是以下面的图形为主，按照规则去除上面图形所占的部分，所以会把对应的路径也去除，而且因为正方形的一条边的两个锚点和圆的上下的两个锚点重合了，所以以圆为准的话上下两个点之间是不存在路径的，所以也无法用剪刀工具去除，要解决这个问题的话，有很多办法，比如上面的将正方形和圆取intersect，得到的左边半圆的部分因为继承了正方形的路径，所以可以用剪刀工具去除，然后将半圆反过来</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1]. <a href="https://www.sketch.com/docs/shapes/#boolean-operations" target="_blank" rel="noopener">boolean-operations</a><br>[2]. <a href="https://www.sketch.com/docs/vector-editing/#opening-and-closing-paths" target="_blank" rel="noopener">paths</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;sketch中提供了布尔运算的功能，就是将几个简单图形组合成复杂图形，路径操作就是对图形上的锚点进行一些操作，一开始学习使用过程中使用这两个功能有遇到几个小问题。这里做一下记录总结。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="设计" scheme="https://owlsn.github.io/blog/categories/%E8%AE%BE%E8%AE%A1/"/>
+    
+    
+      <category term="sketch" scheme="https://owlsn.github.io/blog/tags/sketch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>protobuf实践</title>
+    <link href="https://owlsn.github.io/blog/2019-12-07/protobuf%E5%AE%9E%E8%B7%B5/"/>
+    <id>https://owlsn.github.io/blog/2019-12-07/protobuf实践/</id>
+    <published>2019-12-07T08:21:30.000Z</published>
+    <updated>2020-04-07T06:39:44.313Z</updated>
+    
+    <content type="html"><![CDATA[<p>先直接把官方文档里的一些基础的重要的部分翻译一遍，并上手试试</p><h3 id="开发指南"><a href="#开发指南" class="headerlink" title="开发指南"></a>开发指南</h3><h4 id="基础介绍"><a href="#基础介绍" class="headerlink" title="基础介绍"></a>基础介绍</h4><h5 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h5><h5 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h5><h4 id="c-和go"><a href="#c-和go" class="headerlink" title="c++和go"></a>c++和go</h4><h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1].<a href="https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.compiler.plugin" target="_blank" rel="noopener">plugin.h</a><br>[2].<a href="https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.compiler.code_generator#CodeGenerator" target="_blank" rel="noopener">code_generator.h</a><br>[3].<a href="https://developers.google.com/protocol-buffers/docs/overview" target="_blank" rel="noopener">Developer Guide</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;先直接把官方文档里的一些基础的重要的部分翻译一遍，并上手试试&lt;/p&gt;
+&lt;h3 id=&quot;开发指南&quot;&gt;&lt;a href=&quot;#开发指南&quot; class=&quot;headerlink&quot; title=&quot;开发指南&quot;&gt;&lt;/a&gt;开发指南&lt;/h3&gt;&lt;h4 id=&quot;基础介绍&quot;&gt;&lt;a href=&quot;#基础介
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="cpp" scheme="https://owlsn.github.io/blog/tags/cpp/"/>
+    
+      <category term="go" scheme="https://owlsn.github.io/blog/tags/go/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>推荐技术分享</title>
+    <link href="https://owlsn.github.io/blog/2019-12-03/%E6%8E%A8%E8%8D%90%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <id>https://owlsn.github.io/blog/2019-12-03/推荐技术分享/</id>
+    <published>2019-12-03T10:44:31.000Z</published>
+    <updated>2020-04-07T06:39:44.315Z</updated>
+    
+    <content type="html"><![CDATA[<p>推荐技术分享</p><p>### </p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;推荐技术分享&lt;/p&gt;
+&lt;p&gt;### &lt;/p&gt;
+
+      
+    
+    </summary>
+    
+      <category term="心得分享" scheme="https://owlsn.github.io/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/"/>
+    
+    
+      <category term="推荐系统" scheme="https://owlsn.github.io/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>bazel实践</title>
+    <link href="https://owlsn.github.io/blog/2019-11-30/bazel%E5%AE%9E%E8%B7%B5/"/>
+    <id>https://owlsn.github.io/blog/2019-11-30/bazel实践/</id>
+    <published>2019-11-30T08:07:58.000Z</published>
+    <updated>2020-04-07T06:39:44.306Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前总结了<code>c++</code>开发的一些基础，现在总结一下使用<code>bazel</code>做c++项目构建工具实践中的一些注意点。   </p><h3 id="helloworld"><a href="#helloworld" class="headerlink" title="helloworld"></a>helloworld</h3><p>官方提供了几个<code>helloworld</code>的构建例子，这里简单过一下项目结构，<br><code>git clone https://github.com/bazelbuild/examples</code>,写好BUILD文件后，执行bazel对应的命令即可完成构建<br><a id="more"></a></p><pre><code>examples└── cpp-tutorial    ├──stage1    │  ├── main    │  │   ├── BUILD    │  │   └── hello-world.cc    │  └── WORKSPACE    ├──stage2    │  ├── main    │  │   ├── BUILD    │  │   ├── hello-world.cc    │  │   ├── hello-greet.cc    │  │   └── hello-greet.h    │  └── WORKSPACE    └──stage3       ├── main       │   ├── BUILD       │   ├── hello-world.cc       │   ├── hello-greet.cc       │   └── hello-greet.h       ├── lib       │   ├── BUILD       │   ├── hello-time.cc       │   └── hello-time.h       └── WORKSPACE</code></pre><p>从这几个<code>helloworld</code>的例子里，基本就能学会构建简单的项目，不过这几个例子里没有讲到引用第三方库的情况</p><h4 id="1-单构建目标"><a href="#1-单构建目标" class="headerlink" title="1.单构建目标"></a>1.单构建目标</h4><p>srcs说明源文件的相对路径,<code>cc_binary</code>表示构建为可执行二进制文件</p><pre><code>cc_binary(    name = &quot;hello-world&quot;,    srcs = [&quot;hello-world.cc&quot;],)</code></pre><h4 id="2-多构建目标"><a href="#2-多构建目标" class="headerlink" title="2.多构建目标"></a>2.多构建目标</h4><p><code>deps</code>表示<code>hello-world</code>依赖<code>hello-greet</code>库,<code>cc_library</code>将<code>hello-greet</code>构建为<code>library</code>供<code>hello-world</code>链接,hdrs指明头文件，因为在同一目录下，所以直接写文件名就可以找得到对应的文件</p><pre><code>cc_library(    name = &quot;hello-greet&quot;,    srcs = [&quot;hello-greet.cc&quot;],    hdrs = [&quot;hello-greet.h&quot;],)cc_binary(    name = &quot;hello-world&quot;,    srcs = [&quot;hello-world.cc&quot;],    deps = [        &quot;:hello-greet&quot;,    ],)</code></pre><h4 id="3-跨目录构建"><a href="#3-跨目录构建" class="headerlink" title="3.跨目录构建"></a>3.跨目录构建</h4><p>最终构建的可执行文件为<code>hello-world</code>,需要链接<code>hello-time</code>和<code>hello-greet</code>库文件，<code>hello-time</code>源代码文件在<code>lib</code>目录下<br>对于<code>lib/BUILD</code>文件,构建<code>hello-time</code>库，要设置<code>visibility</code>属性,这样才能被<code>hello-world</code>引用到, <code>visibility</code>属性默认是<code>private</code>，具体的规则<code>//</code>表示向外层目录找到的第一个<code>WORKSPACE</code>文件所在的目录，然后<code>main</code>表示<code>main</code>文件夹,<code>//main:__pkg__</code>表示的是<code>main</code>文件夹下的包都可以看到这条<code>rule</code>，<code>rule</code>表示的就是整个<code>cc_library</code>表示的内容，也就是可以引用<code>hello-time</code>库</p><pre><code>cc_library(    name = &quot;hello-time&quot;,    srcs = [&quot;hello-time.cc&quot;],    hdrs = [&quot;hello-time.h&quot;],    visibility = [&quot;//main:__pkg__&quot;],)</code></pre><p>对于<code>main/BUILD</code>文件，不同的地方就是<code>deps</code>里增加了引用<code>hello-time</code>的内容，<code>//lib:hello-time</code>表示<code>lib</code>文件夹下的<code>hello-time</code>库,如果<code>hello-time</code>的构建规则里没有<code>visibility</code>那一项，这里引用就会报错</p><pre><code>cc_library(    name = &quot;hello-greet&quot;,    srcs = [&quot;hello-greet.cc&quot;],    hdrs = [&quot;hello-greet.h&quot;],)cc_binary(    name = &quot;hello-world&quot;,    srcs = [&quot;hello-world.cc&quot;],    deps = [        &quot;:hello-greet&quot;,        &quot;//lib:hello-time&quot;,    ],)</code></pre><h4 id="4-引用目标库的路径规则"><a href="#4-引用目标库的路径规则" class="headerlink" title="4.引用目标库的路径规则"></a>4.引用目标库的路径规则</h4><pre><code>//path/to/package:target-name </code></pre><p>1.如果<code>target-name</code>是<code>rule target</code>,<code>path/to/package</code>就是到<code>BUILD</code>文件目录的路径，<code>target-name</code>就是<code>BUILD</code>文件里定义的需要编译的库<br>2.如果<code>target-name</code>包含路径的target，那么<code>path/to/package</code>就是到<code>BUILD</code>的根<code>WORKSPACE</code>文件的路径，<code>target-name</code>路径最后一项表示构建目标<br>3.当在项目根目录内执行构建的时候，可以直接使用<code>//</code>表示根目录<br>4.当在<code>BUILD</code>文件目录内执行的时候，可以直接使用<code>:target-name</code>表示构建目标   </p><h4 id="5-构建外部依赖"><a href="#5-构建外部依赖" class="headerlink" title="5.构建外部依赖"></a>5.构建外部依赖</h4><p><code>bazel</code>项目一般来说一个<code>WORKDPACE</code>文件就标志一个独立的项目，也可以说是一个独立的模块，当要引用其他项目中的库的时候，有几种情况</p><h5 id="构建本地bazel项目"><a href="#构建本地bazel项目" class="headerlink" title="构建本地bazel项目"></a>构建本地bazel项目</h5><p>引用<code>coworkers_project</code>中的库，在<code>my_project/WORKSPACE</code>中定义<code>local_repository</code>, <code>coworkers_project</code>中的项目<code>//foo:bar</code>，在<code>my_project</code>的BUILD中可以通过<code>@coworkers_project//foo:bar</code>方式引用</p><pre><code>local_repository(    name = &quot;coworkers_project&quot;,    path = &quot;/path/to/coworkers-project&quot;,)</code></pre><h5 id="构建本地非bazel项目"><a href="#构建本地非bazel项目" class="headerlink" title="构建本地非bazel项目"></a>构建本地非bazel项目</h5><p>在<code>my_project/WORKSPACE</code>中使用<code>new_local_repository</code>创建本地非<code>bazel</code>构建的项目，另外需要自己写一个<code>BUILD</code>文件给<code>coworkers_project</code>定义编译的规则</p><pre><code>new_local_repository(    name = &quot;coworkers_project&quot;,    path = &quot;/path/to/coworkers-project&quot;,    build_file = &quot;coworker.BUILD&quot;,)</code></pre><p>在<code>coworker.BUILD</code>文件中，就是构建<code>coworker</code>库的相关的内容。这个<code>BUILD</code>文件的路径，是相对于写<code>new_local_repository</code>的<code>WORKSPACE</code>的文件的，然后就可以通过<code>@coworkers_project//:some-lib</code>的方式引用<code>some-lib</code>库</p><pre><code>cc_library(    name = &quot;some-lib&quot;,    srcs = glob([&quot;**&quot;]),    visibility = [&quot;//visibility:public&quot;],)</code></pre><h5 id="构建远程项目"><a href="#构建远程项目" class="headerlink" title="构建远程项目"></a>构建远程项目</h5><p>构建远程项目的时候一般需要先加载<code>bazel_tools</code>中获取远程资源的方法，比如<code>http_archive</code>和<code>git_repository</code>，分别通过<code>http</code>的方式获取和<code>git</code>的方式获取</p><ol><li><p><code>http_archive</code>方式<br>其实和构建本地项目类似</p><pre><code>load(&quot;@bazel_tools//tools/build_defs/repo:http.bzl&quot;, &quot;http_archive&quot;)http_archive(      name = &quot;my_ssl&quot;,      urls = [&quot;http://example.com/openssl.zip&quot;],      sha256 = &quot;e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&quot;,      build_file = &quot;@//:openssl.BUILD&quot;,  )</code></pre></li><li><code>git_repository</code>和<code>new_git_repository</code>方式<br>同<code>http_archive</code>方式，只是有些参数不太相同</li><li><p>缓存  </p><pre><code>ls $(bazel info output_base)/external</code></pre><p>可以查看通过引用外部依赖的方式加载的项目，比如上面说的几种方式   </p><h3 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h3><p>这里通过构建具体项目来熟悉<code>bazel</code>的用法，这里主要写两个，一个是<code>bazel</code>构建项目，一个是非<code>bazel</code>构建项目<br>项目结构</p><pre><code>dir└── project    ├──WORKSPACE    ├──main    │  ├── helloworld    │  │   ├── BUILD    │  │   └── hello-world.cc    │  └── WORKSPACE    ├──common    │  ├── libs    │  │   ├── BUILD    │  │   ├── hello-greet.cc    │  │   └── hello-greet.h    │  └── WORKSPACE    └──thirdparty       ├── googletest       │   ├── BUILD       │   ├── ......       ├── boost       │   ├── boost.BUILD       │   ├── boost.bzl       │   ├── ......       └── WORKSPACE</code></pre><h4 id="googletest"><a href="#googletest" class="headerlink" title="googletest"></a>googletest</h4><p>1.其中<code>googletest</code>本身就是<code>bazel</code>构建的项目，所以直接将<code>googletest</code>项目源码从git上面clone下来，放到<code>thirdparty</code>中，如果在<code>common</code>或者<code>main</code>中需要引用<code>googletest</code>中的<code>test_main</code>库，首先需要在<code>common</code>或者<code>main</code>的<code>WORKSPACE</code>文件中将<code>thirdparty</code>定义为<code>local_repository</code>,而项目的<code>path</code>参数需要根据实际的情况来填写，可以填写相对路径,然后就可以在<code>main</code>或者<code>common</code>中引用<code>googletest</code>中的库了<br>2.上面是单独饮用googletest库的操作，但是对于模块化来说，整个<code>thirdparty</code>应当看作是一个整体，所以可以将<code>thirdparty</code>下的项目先在<code>thirdparty</code>文件夹下添加WORKSPACE文件，将之定义为模块，然后在<code>common</code>和<code>main</code>中，将整个<code>thirdparty</code>定义为local_repository，而引用thirdparty下的某个其他库，就可以以相对路径的形式引用<br>3.这样引用之后，在hello-world源代码中，可以直接饮用gtest头文件</p><pre><code>#include &quot;gtest/gtest.h&quot;</code></pre><h4 id="boost"><a href="#boost" class="headerlink" title="boost"></a>boost</h4><p>1.boost和googletest不同，因为boost本身不是bazel构建的项目，如果我们想要和引用gtest一样引用boost，就需要我们自己编写编译boost的BUILD文件<br>2.编写BUILD的文件的时候，可以自定义处理函数，将这些自定义函数放在.bzl的文件中，然后通过类似于引用bazel_tool库的方式引用里面的方法   </p><pre><code>load(&quot;@bazel_tools//tools/build_defs/repo:http.bzl&quot;, &quot;http_archive&quot;)</code></pre><p>这里如果自己定义了一些处理方法,然后放在boost.bzl文件中，那么就可以以下面的方式引入</p><pre><code>load(&quot;@workspace_name//path/to/boost:boost.bzl&quot;, &quot;some-function&quot;)</code></pre><p>通过这种方式可以简化BUILD文件里面的一些编写规则<br>3.然后就可以和引入googletest中的库类似的方式引入boost中的库了</p><h4 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h4><p>1.其实可以将整个thirdpary中的库都以http_archive的方式或者git_repository的方式代替local_repository的方式加载，将源码下载在本地后加载的方式和在线获取外部依赖的方式相比，可能会适用于有些不能在线获取资源的情况，而且将第三方资源和本地代码放在一起会直观一些</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1].<a href="https://docs.bazel.build/versions/master/tutorial/cpp.html" target="_blank" rel="noopener">Introduction to Bazel: Building a C++ Project</a><br>[2].<a href="https://docs.bazel.build/versions/master/be/c-cpp.html" target="_blank" rel="noopener">c/cpp rules</a><br>[3].<a href="https://docs.bazel.build/versions/master/be/common-definitions.html#common.visibility" target="_blank" rel="noopener">common.visibility</a><br>[4].<a href="https://docs.bazel.build/versions/master/external.html" target="_blank" rel="noopener">Working with external dependencies</a><br>[5].<a href="https://docs.bazel.build/versions/master/repo/http.html#http_archive" target="_blank" rel="noopener">http_archive</a><br>[6].<a href="https://docs.bazel.build/versions/master/repo/git.html#git_repository" target="_blank" rel="noopener">git_repository</a></p></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;之前总结了&lt;code&gt;c++&lt;/code&gt;开发的一些基础，现在总结一下使用&lt;code&gt;bazel&lt;/code&gt;做c++项目构建工具实践中的一些注意点。   &lt;/p&gt;
+&lt;h3 id=&quot;helloworld&quot;&gt;&lt;a href=&quot;#helloworld&quot; class=&quot;headerlink&quot; title=&quot;helloworld&quot;&gt;&lt;/a&gt;helloworld&lt;/h3&gt;&lt;p&gt;官方提供了几个&lt;code&gt;helloworld&lt;/code&gt;的构建例子，这里简单过一下项目结构，&lt;br&gt;&lt;code&gt;git clone https://github.com/bazelbuild/examples&lt;/code&gt;,写好BUILD文件后，执行bazel对应的命令即可完成构建&lt;br&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="cpp" scheme="https://owlsn.github.io/blog/tags/cpp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>c,c++标准</title>
+    <link href="https://owlsn.github.io/blog/2019-11-24/c,c++%E6%A0%87%E5%87%86/"/>
+    <id>https://owlsn.github.io/blog/2019-11-24/c,c++标准/</id>
+    <published>2019-11-24T14:03:20.000Z</published>
+    <updated>2020-04-07T06:39:44.307Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="c-c-标准"><a href="#c-c-标准" class="headerlink" title="c/c++标准"></a>c/c++标准</h3><h4 id="c标准"><a href="#c标准" class="headerlink" title="c标准"></a>c标准</h4><table><thead><tr><th>时间</th><th>名称</th><th>标准制定组织</th><th>事件</th></tr></thead><tbody><tr><td>1978</td><td>K&amp;R标准</td><td>K&amp;R</td><td>《The C Programming Language》author: K&amp;R</td></tr><tr><td>1989</td><td>ANSI C / C89</td><td>ANSI</td><td>ANSI通过C语言标准</td></tr><tr><td>1990</td><td>C90</td><td>ISO &amp; IEC</td><td>ISO&amp;IEC将C89标准定为C语言国际标准</td></tr><tr><td>1994</td><td>C94</td><td>ISO &amp; IEC</td><td>ISO&amp;IEC发布C89标准修订版，即C94</td></tr><tr><td>1995</td><td>C95</td><td>ISO &amp; IEC</td><td>ISO&amp;IEC发布C94标准修订版，即C95</td></tr><tr><td>1999</td><td>C99</td><td>ISO &amp; IEC</td><td>ISO&amp;IEC发布C语言新标准，即C99。这是C语言第二个标准</td></tr><tr><td>2011</td><td>C11</td><td>ISO &amp; IEC</td><td>ISO&amp;IEC发布C语言新标准，即C11。这是C语言第三个标准</td></tr></tbody></table><a id="more"></a><h4 id="c-标准"><a href="#c-标准" class="headerlink" title="c++标准"></a>c++标准</h4><table><thead><tr><th>时间</th><th>名称</th><th>标准制定组织</th><th>事件</th></tr></thead><tbody><tr><td>1998</td><td>C++ 98 标准</td><td>ISO &amp; IEC</td><td>1998年C++标准得到ISO和ANSI批准。以后每5年视实际需要更新一次。</td></tr><tr><td>2003</td><td>C++ 03 标准</td><td>ISO &amp; IEC</td><td>2003年通过了C++标准第二版。</td></tr><tr><td>2011</td><td>C++ 11 标准</td><td>ISO &amp; IEC</td><td>2011年发布了C++标准第四版C++ 11，取代现行的C++ 98 和 C++ 03。此次标准为 C++ 98发布13年来第一次重大修正。</td></tr><tr><td>2014</td><td>C++ 14 标准</td><td>ISO &amp; IEC</td><td>2014年发布了C++标准第四版C++ 14，是 C++ 11的增量更新。</td></tr></tbody></table><p>现在用的比较多的应该是c++11标准</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;c-c-标准&quot;&gt;&lt;a href=&quot;#c-c-标准&quot; class=&quot;headerlink&quot; title=&quot;c/c++标准&quot;&gt;&lt;/a&gt;c/c++标准&lt;/h3&gt;&lt;h4 id=&quot;c标准&quot;&gt;&lt;a href=&quot;#c标准&quot; class=&quot;headerlink&quot; title=&quot;c标准&quot;&gt;&lt;/a&gt;c标准&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;时间&lt;/th&gt;
+&lt;th&gt;名称&lt;/th&gt;
+&lt;th&gt;标准制定组织&lt;/th&gt;
+&lt;th&gt;事件&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1978&lt;/td&gt;
+&lt;td&gt;K&amp;amp;R标准&lt;/td&gt;
+&lt;td&gt;K&amp;amp;R&lt;/td&gt;
+&lt;td&gt;《The C Programming Language》author: K&amp;amp;R&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1989&lt;/td&gt;
+&lt;td&gt;ANSI C / C89&lt;/td&gt;
+&lt;td&gt;ANSI&lt;/td&gt;
+&lt;td&gt;ANSI通过C语言标准&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1990&lt;/td&gt;
+&lt;td&gt;C90&lt;/td&gt;
+&lt;td&gt;ISO &amp;amp; IEC&lt;/td&gt;
+&lt;td&gt;ISO&amp;amp;IEC将C89标准定为C语言国际标准&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1994&lt;/td&gt;
+&lt;td&gt;C94&lt;/td&gt;
+&lt;td&gt;ISO &amp;amp; IEC&lt;/td&gt;
+&lt;td&gt;ISO&amp;amp;IEC发布C89标准修订版，即C94&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1995&lt;/td&gt;
+&lt;td&gt;C95&lt;/td&gt;
+&lt;td&gt;ISO &amp;amp; IEC&lt;/td&gt;
+&lt;td&gt;ISO&amp;amp;IEC发布C94标准修订版，即C95&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1999&lt;/td&gt;
+&lt;td&gt;C99&lt;/td&gt;
+&lt;td&gt;ISO &amp;amp; IEC&lt;/td&gt;
+&lt;td&gt;ISO&amp;amp;IEC发布C语言新标准，即C99。这是C语言第二个标准&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2011&lt;/td&gt;
+&lt;td&gt;C11&lt;/td&gt;
+&lt;td&gt;ISO &amp;amp; IEC&lt;/td&gt;
+&lt;td&gt;ISO&amp;amp;IEC发布C语言新标准，即C11。这是C语言第三个标准&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="cpp" scheme="https://owlsn.github.io/blog/tags/cpp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>js对象拷贝</title>
+    <link href="https://owlsn.github.io/blog/2019-11-23/js%E5%AF%B9%E8%B1%A1%E6%8B%B7%E8%B4%9D/"/>
+    <id>https://owlsn.github.io/blog/2019-11-23/js对象拷贝/</id>
+    <published>2019-11-23T07:55:22.000Z</published>
+    <updated>2020-04-07T06:39:44.309Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="问题出现"><a href="#问题出现" class="headerlink" title="问题出现"></a>问题出现</h3><p>1.因为后端传过来的数据的形式和展示到页面上所需要的形式不太一致，所以需要将数据重新组装一下。<br>2.首先想的是重新自己定义一个对象，然后把数据遍历一边，把需要的数据拿出来，放到自己定义对象里面，这是很常规的操作，但是最后得到的却不是我预想的结果  </p><h3 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h3><pre><code>// 原始数据 origin// 定义两个对象存储最后组装的结果let result = []for(let i = 0; i &lt; origin.length ;i++){    let attr1 = orogin[i].attr1    for(let j = 0; j &lt; attr1.length; j++){        let attr2 = attr1[j].attr2        let item = {}        let item = {&apos;a1&apos;: attr2[&apos;a1&apos;], &apos;a2&apos;: attr2[&apos;a2&apos;]...}        result.push[item]    }}</code></pre><a id="more"></a><p>这样最后得到的result里面的结果item,都是最后一个元素的值。  </p><h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><p>1.其实这个问题是很容易想到的，只要最后的结果发现不一致，稍微推敲一下就知道是result存的是item对象的引用，而没有存入真正的值<br>2.这里面涉及到的js对象的一些知识还是比较丰富的，单纯解决这个问题比较简单，采用深复制的方法，result里面存item深复制后的结果就好了</p><h3 id="具体原理"><a href="#具体原理" class="headerlink" title="具体原理"></a>具体原理</h3><p>1.js对象,对象是属性的集合。<br>  1.1.访问未声明的对象的属性得到的是undefined,而不是null。<br>  1.2.属性名如果是动态的，只能通过方括号标记访问。<br>  1.3.枚举对象所有属性的方式(ES5以后)：for…in…可以访问对象本身和原形链中的属性；Object.keys()返回不包括原形链中的自身所有可枚举属性的数组；Object.getOwnPropertyNames()返回不包括原形链中的所有属性，包括不可枚举的属性<br>  1.4.对象的属性可以是函数<br>2.原型和类   </p><table><thead><tr><th>基于类的（Java）</th><th>基于原型的（JavaScript）</th></tr></thead><tbody><tr><td>类和实例是不同的事物。</td><td>所有对象均为实例。</td></tr><tr><td>通过类定义来定义类；通过构造器方法来实例化类。</td><td>通过构造器函数来定义和创建一组对象。</td></tr><tr><td>通过 new 操作符创建单个对象。</td><td>相同。</td></tr><tr><td>通过类定义来定义现存类的子类，从而构建对象的层级结构。</td><td>指定一个对象作为原型并且与构造函数一起构建对象的层级结构</td></tr><tr><td>遵循类链继承属性。</td><td>遵循原型链继承属性。</td></tr><tr><td>类定义指定类的所有实例的所有属性。无法在运行时动态添加属性。</td><td>构造器函数或原型指定初始的属性集。允许动态地向单个的对象或者整个对象集中添加或移除属性。</td></tr></tbody></table><p>3.原形链<br>4.深拷贝与浅拷贝<br>4.1.浅拷贝只拷贝对象里的一层的属性，而对象的属性有的是对其他对象的引用，如果只拷贝引用，当引用的对象值发生变化的时候，拷贝得到的结果也发生了变化<br>4.2.浅拷贝的实现方式：=号赋值；for…in…赋值；Object.assign;<br>4.3.深拷贝就是拷贝多层，将属性中引用的其他对象的值也拷贝一份<br>4.4.深拷贝的实现方式：递归拷贝对象所有层级上的属性；使用JSON对象的序列化和反序列化方法；lodash函数；Object.create方式</p><h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>1.深拷贝的实现方式<br>1.1.对于没有深层次引用的对象，深拷贝很容易，for…in…和Object.assign都可以实现<br>1.2.对于有深层次结构，但是都是值都是json中可表示的类型，比如number，string,array等等，可以直接用JSON的处理方式，如果是其他的类型，比如function这种，用这种方式就不行，因为function会被转化成其他类型的对象<br>1.3.递归拷贝的方式可以处理大部分的情况，但是对于互相引用的情况可能会陷入死循环<br>1.4.Object.create方式现在看来是最简单的深拷贝的方式</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1]. <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Working_with_Objects" target="_blank" rel="noopener">Working with objects</a>.<br>[2]. <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Details_of_the_Object_Model" target="_blank" rel="noopener">Details of the object model</a>.<br>[3]. <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain" target="_blank" rel="noopener">继承与原形链</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;问题出现&quot;&gt;&lt;a href=&quot;#问题出现&quot; class=&quot;headerlink&quot; title=&quot;问题出现&quot;&gt;&lt;/a&gt;问题出现&lt;/h3&gt;&lt;p&gt;1.因为后端传过来的数据的形式和展示到页面上所需要的形式不太一致，所以需要将数据重新组装一下。&lt;br&gt;2.首先想的是重新自己定义一个对象，然后把数据遍历一边，把需要的数据拿出来，放到自己定义对象里面，这是很常规的操作，但是最后得到的却不是我预想的结果  &lt;/p&gt;
+&lt;h3 id=&quot;具体代码&quot;&gt;&lt;a href=&quot;#具体代码&quot; class=&quot;headerlink&quot; title=&quot;具体代码&quot;&gt;&lt;/a&gt;具体代码&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;// 原始数据 origin
+// 定义两个对象存储最后组装的结果
+let result = []
+for(let i = 0; i &amp;lt; origin.length ;i++){
+    let attr1 = orogin[i].attr1
+    for(let j = 0; j &amp;lt; attr1.length; j++){
+        let attr2 = attr1[j].attr2
+        let item = {}
+        let item = {&amp;apos;a1&amp;apos;: attr2[&amp;apos;a1&amp;apos;], &amp;apos;a2&amp;apos;: attr2[&amp;apos;a2&amp;apos;]...}
+        result.push[item]
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="js" scheme="https://owlsn.github.io/blog/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>c++基础：编译和构建工具</title>
+    <link href="https://owlsn.github.io/blog/2019-11-14/c++%E5%9F%BA%E7%A1%80:%E7%BC%96%E8%AF%91%E5%92%8C%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7/"/>
+    <id>https://owlsn.github.io/blog/2019-11-14/c++基础:编译和构建工具/</id>
+    <published>2019-11-14T04:00:53.000Z</published>
+    <updated>2020-04-07T06:39:44.307Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>最近又开始学c++了，因为项目中有用到，要开发项目，首先要搭环境，要先熟悉一下编译过程和构建工具</p><h3 id="编译工具gcc和g"><a href="#编译工具gcc和g" class="headerlink" title="编译工具gcc和g++"></a>编译工具gcc和g++</h3><h4 id="代码编译过程"><a href="#代码编译过程" class="headerlink" title="代码编译过程"></a>代码编译过程</h4><p><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/GCC_CompilationProcess.png" alt=""><br>1.预处理,引入#include头文件以及宏定义展开，得到文本文件<br>cpp hello.c &gt; hello.i<br>2.编译，将预处理后的文件转换成汇编代码,得到程序的汇编代码<br>gcc -S hello.i<br>3.汇编,将上一步汇编语言代码转换成机器码,得到二进制目标文件<br>as -o hello.o hello.s<br>4.链接,将多个目标文件以及所需的库文件链接成最终的可执行文件<br>ld -o hello.exe hello.0 —libraries…<br><a id="more"></a></p><h4 id="静态和动态库文件"><a href="#静态和动态库文件" class="headerlink" title="静态和动态库文件"></a>静态和动态库文件</h4><p>1.静态库文件在unix系统以.a(archive file)结尾，在windows系统以.lib(library)结尾,静态库文件中的代码会被拷贝进自己的程序中，通过gcc的ar命令可以生成静态库文件<br>2.动态库文件在unix系统以.so(shared objects)结尾，在windows系统以.dll(dynamic link library)结尾,只有一部分映射关系会被记录在可执行文件中，当最后的可执行文件开始运行的时候，操作系统才会根据映射关系去加载动态库文件，这个操作就叫做动态链接，最后生成的可执行文件体积就会小很多，而且动态库文件可以被很多程序共享同一份拷贝，所以可以节约空间，另外动态库文件代码更新后也不会影响其他的调用程序   </p><h5 id="include头文件和加载库文件"><a href="#include头文件和加载库文件" class="headerlink" title="include头文件和加载库文件"></a>include头文件和加载库文件</h5><p>1.-Idir或者CPATH环境变量可以指定编译时寻找include头文件的路径<br>2.-Ldir或者LIBRARY_PATH环境变量可以指定寻找库文件的路径<br>3.unix系统可以通过-lxxx指定libxxx.a库文件的名称，windows系统可以通过-lxxx.lib指定库文件的名称<br>4.没有指定时的默认include-paths和library-paths以及libraries，通过cpp -v 命令可以查看，gcc编译时-v 参数可以查看library-paths(-L)和libraries(-l) </p><pre><code>&gt; cpp -v......#include &quot;...&quot; search starts here:#include &lt;...&gt; search starts here: /usr/lib/gcc/x86_64-linux-gnu/5/include /usr/local/include /usr/lib/gcc/x86_64-linux-gnu/5/include-fixed /usr/include/x86_64-linux-gnu /usr/includeEnd of search list.&gt; g++ -v -o hello.exe helloworld.cc......#include &quot;...&quot; search starts here:#include &lt;...&gt; search starts here: /usr/include/c++/5 /usr/include/x86_64-linux-gnu/c++/5 /usr/include/c++/5/backward /usr/lib/gcc/x86_64-linux-gnu/5/include /usr/local/include /usr/lib/gcc/x86_64-linux-gnu/5/include-fixed /usr/include/x86_64-linux-gnu /usr/includeEnd of search list.......COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/5/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/5/../../../:/lib/:/usr/lib/COLLECT_GCC_OPTIONS=&apos;-v&apos; &apos;-o&apos; &apos;hello.ext&apos; &apos;-shared-libgcc&apos; &apos;-mtune=generic&apos; &apos;-march=x86-64&apos; /usr/lib/gcc/x86_64-linux-gnu/5/collect2 -plugin /usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper -plugin-opt=-fresolution=/tmp/cckcI1Gr.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o hello.ext /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/5/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/5/../../.. /tmp/ccNcB9ML.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/5/crtend.o /usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crtn.o</code></pre><h4 id="gcc环境变量"><a href="#gcc环境变量" class="headerlink" title="gcc环境变量"></a>gcc环境变量</h4><p>1.PATH,寻找动态库文件路径<br>2.CPATH,寻找include头文件路径<br>3.LIBRARY_PATH,寻找库文件路径  </p><h3 id="make"><a href="#make" class="headerlink" title="make"></a>make</h3><p>gcc和g++命令编译几个文件还可以应付，但是大型项目成千上万个文件就无法处理了，make就像是执行gcc/g++命令的脚本工具，make应该是应用最广泛的c/c++编译工具了<br>使用make要编写makefile，要先学习makefile的语法   </p><h3 id="bazel"><a href="#bazel" class="headerlink" title="bazel"></a>bazel</h3><p>make的功能应该是很强大了，基本上对于大型项目来说已经够用了，但是make也有一些不足，当项目逐渐变大的时候，makefile也会变得越来越臃肿了，bazel是谷歌开源的一个构建工具，用起来比make更加方便，而且编译时可以只编译更新的部分。</p><h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p>[1].<a href="https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html" target="_blank" rel="noopener">Compiling, Linking and Building<br>C/C++ Applications</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;p&gt;最近又开始学c++了，因为项目中有用到，要开发项目，首先要搭环境，要先熟悉一下编译过程和构建工具&lt;/p&gt;
+&lt;h3 id=&quot;编译工具gcc和g&quot;&gt;&lt;a href=&quot;#编译工具gcc和g&quot; class=&quot;headerlink&quot; title=&quot;编译工具gcc和g++&quot;&gt;&lt;/a&gt;编译工具gcc和g++&lt;/h3&gt;&lt;h4 id=&quot;代码编译过程&quot;&gt;&lt;a href=&quot;#代码编译过程&quot; class=&quot;headerlink&quot; title=&quot;代码编译过程&quot;&gt;&lt;/a&gt;代码编译过程&lt;/h4&gt;&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/owlsn/blog/master/source/source/GCC_CompilationProcess.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;1.预处理,引入#include头文件以及宏定义展开，得到文本文件&lt;br&gt;cpp hello.c &amp;gt; hello.i&lt;br&gt;2.编译，将预处理后的文件转换成汇编代码,得到程序的汇编代码&lt;br&gt;gcc -S hello.i&lt;br&gt;3.汇编,将上一步汇编语言代码转换成机器码,得到二进制目标文件&lt;br&gt;as -o hello.o hello.s&lt;br&gt;4.链接,将多个目标文件以及所需的库文件链接成最终的可执行文件&lt;br&gt;ld -o hello.exe hello.0 —libraries…&lt;br&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="cpp" scheme="https://owlsn.github.io/blog/tags/cpp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>promise.all注意事项</title>
+    <link href="https://owlsn.github.io/blog/2019-11-14/promise.all%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/"/>
+    <id>https://owlsn.github.io/blog/2019-11-14/promise.all注意事项/</id>
+    <published>2019-11-14T02:11:02.000Z</published>
+    <updated>2020-04-07T06:39:44.313Z</updated>
+    
+    <content type="html"><![CDATA[<p>记录一下最近遇到的bug。</p><h3 id="问题出现"><a href="#问题出现" class="headerlink" title="问题出现"></a>问题出现</h3><pre><code>//最外层async doRequest(){    ...    // 调用处    let ret = await fun(...)    ...}// fun()内部fun(){    ...    let promises = []    for(;;){        ...        promises.push(new Promise(resolve, reject){            axios.post(...).then(()=&gt;{resolve()}).catch(()=&gt;{reject()})        })        ...    }    ...    let results = await Promise.all(promises)    //遍历results，整理结果    for(;;){        if(results[i].status == 200){            ...        }        else{            ...        }    }    return ...}</code></pre><a id="more"></a><p>出现bug的时候，axios请求的后端接口直接报500错误，后端数据库报错，database error，然后整个方法好像就停在了<code>let ret = await fun(...)</code>这一步，后面的代码都不再执行了。  </p><h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><ol><li>promise.all没有考虑出错情况，或者是有相当出错情况，但是处理方式不对</li><li>promise的运行方式不太了解</li><li>使用promise.all一次发送了太多的请求，可以和后端沟通提供批量处理的接口，将所有的参数包裹在一次请求里面  </li></ol><h3 id="具体原理"><a href="#具体原理" class="headerlink" title="具体原理"></a>具体原理</h3><ol><li>promise.all获得成功的结果顺序和promises数组顺序是相同的</li><li>promise.all如果有一个回调执行失败，那么整个都会失败，并且会立即返回失败</li><li>在async函数内部，await后面的函数如果抛出错误，而且没有被正确的处理，那么async函数也会中止执行，等同于promise对象被reject了</li><li>axios默认是200到300之间的返回status执行resolve，而其他的状态码执行reject</li></ol><h3 id="执行过程"><a href="#执行过程" class="headerlink" title="执行过程"></a>执行过程</h3><ol><li>promise.all这里，当其中一个axios.post返回500时，执行axios的catch方法，即new Promise的reject方法，reject方法返回rejected状态的promise对象.   </li><li>new Promise返回rejected状态的promise对象，  </li><li>错误被promise.all捕获，promise.all返回rejected，  </li><li>promise.all没有catch方法对错误进行处理，所以被async函数捕获错误，直接中止后面的代码执行  </li></ol><h3 id="bug修复"><a href="#bug修复" class="headerlink" title="bug修复"></a>bug修复</h3><p>在上面说的任意一步对抛出的异常进行处理，然后返回处理后的结果，那么后面就不会终止async函数的执行，但是在各个步骤加错误处理得到的结果可能会不太一样  </p><ol><li>定义axios的响应拦截器,  <code>Axios.interceptors.response.use(response=&gt;{}, error=&gt;{})</code>.<br>在error处理里面修改对状态码的判断，即使是返回500也执行resolve方法,这个修改方式对现有的逻辑影响会比较大</li><li>在<code>new Promise</code>这里定义<code>catch</code>函数，将错误处理后执行resolve结果，这个方式是比较妥当的，promise.all可以继续按原来的逻辑执行，也不会影响其他的地方</li><li>对promise.all方法，添加<code>catch</code>函数，将错误处理后执行resolve，这个方式虽然能够让async函数继续执行下去，但是<code>let results = await Promise.all(promises)</code>这一步results就不会有任何返回了，后面的代码执行下去也是错的了，所以这样修改虽然能够保证代码执行，但是得到的是错误的结果</li></ol><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>[1].    <a href="http://www.axios-js.com/docs/" target="_blank" rel="noopener">axios文档</a><br>[2].    <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise" target="_blank" rel="noopener">promise</a><br>[3].    <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/async_function" target="_blank" rel="noopener">async</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;记录一下最近遇到的bug。&lt;/p&gt;
+&lt;h3 id=&quot;问题出现&quot;&gt;&lt;a href=&quot;#问题出现&quot; class=&quot;headerlink&quot; title=&quot;问题出现&quot;&gt;&lt;/a&gt;问题出现&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;//最外层
+async doRequest(){
+    ...
+    // 调用处
+    let ret = await fun(...)
+    ...
+}
+
+
+// fun()内部
+fun(){
+    ...
+    let promises = []
+    for(;;){
+        ...
+        promises.push(new Promise(resolve, reject){
+            axios.post(...).then(()=&amp;gt;{resolve()}).catch(()=&amp;gt;{reject()})
+        })
+        ...
+    }
+    ...
+
+    let results = await Promise.all(promises)
+    //遍历results，整理结果
+    for(;;){
+        if(results[i].status == 200){
+            ...
+        }
+        else{
+            ...
+        }
+    }
+    return ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="js" scheme="https://owlsn.github.io/blog/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>webpack总结</title>
+    <link href="https://owlsn.github.io/blog/2019-10-27/webpack%E6%80%BB%E7%BB%93/"/>
+    <id>https://owlsn.github.io/blog/2019-10-27/webpack总结/</id>
+    <published>2019-10-27T13:06:12.000Z</published>
+    <updated>2020-04-07T06:39:44.314Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h3><p>  webpack的一些常用参数配置和用法</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;主要内容&quot;&gt;&lt;a href=&quot;#主要内容&quot; class=&quot;headerlink&quot; title=&quot;主要内容&quot;&gt;&lt;/a&gt;主要内容&lt;/h3&gt;&lt;p&gt;  webpack的一些常用参数配置和用法&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="web前端" scheme="https://owlsn.github.io/blog/tags/web%E5%89%8D%E7%AB%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>owlsledger</title>
+    <link href="https://owlsn.github.io/blog/2019-10-23/owlsledger/"/>
+    <id>https://owlsn.github.io/blog/2019-10-23/owlsledger/</id>
+    <published>2019-10-23T09:39:00.000Z</published>
+    <updated>2020-04-07T06:39:44.311Z</updated>
+    
+    <content type="html"><![CDATA[<p>  最近突然想做一个实践项目，不仅仅是为了锻炼技术，更重要的是想了解一些做产品的知识，增加这方面的经验。然后在网上看了很多小的demo项目，觉得记账app这种项目如果只是想练手玩玩，可以做的很简单，如果想往大了做，也可以做的很复杂锻炼自己的技术，所以就这么决定下来了。<br>  现在初步想要实现的功能有：1.简单记账，2.同时接入一些常用的app的接口，比如支付宝或者微信什么的，3.给用户实现一个可以查看自身数据的后台，4.然后就是后端实现一个查看所有统计数据的管理后台<br>  然后实现的平台有：android，ios，小程序，公众号，android和ios这两个平台在考虑是否使用react-native统一开发，这个还要在之后的开发中再决定</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;  最近突然想做一个实践项目，不仅仅是为了锻炼技术，更重要的是想了解一些做产品的知识，增加这方面的经验。然后在网上看了很多小的demo项目，觉得记账app这种项目如果只是想练手玩玩，可以做的很简单，如果想往大了做，也可以做的很复杂锻炼自己的技术，所以就这么决定下来了。&lt;br
+      
+    
+    </summary>
+    
+      <category term="个人开发" scheme="https://owlsn.github.io/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/"/>
+    
+    
+      <category term="产品" scheme="https://owlsn.github.io/blog/tags/%E4%BA%A7%E5%93%81/"/>
+    
+      <category term="个人开发" scheme="https://owlsn.github.io/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>总结</title>
+    <link href="https://owlsn.github.io/blog/2019-09-04/%E6%80%BB%E7%BB%93/"/>
+    <id>https://owlsn.github.io/blog/2019-09-04/总结/</id>
+    <published>2019-09-04T08:29:19.000Z</published>
+    <updated>2020-04-07T06:39:44.315Z</updated>
+    
+    <content type="html"><![CDATA[<p>###反向传播算法<br>    1.损失函数<br>    2.激活函数</p><p>###神经网络</p><p>###cnn</p><p>###rnn</p><p>###lstm</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;###反向传播算法&lt;br&gt;    1.损失函数&lt;br&gt;    2.激活函数&lt;/p&gt;
+&lt;p&gt;###神经网络&lt;/p&gt;
+&lt;p&gt;###cnn&lt;/p&gt;
+&lt;p&gt;###rnn&lt;/p&gt;
+&lt;p&gt;###lstm&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>支持向量机</title>
+    <link href="https://owlsn.github.io/blog/2019-06-10/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/"/>
+    <id>https://owlsn.github.io/blog/2019-06-10/支持向量机/</id>
+    <published>2019-06-10T12:38:56.000Z</published>
+    <updated>2020-04-07T06:39:44.315Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="机器学习" scheme="https://owlsn.github.io/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>神经网络</title>
+    <link href="https://owlsn.github.io/blog/2019-06-09/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    <id>https://owlsn.github.io/blog/2019-06-09/神经网络/</id>
+    <published>2019-06-09T11:25:37.000Z</published>
+    <updated>2020-04-07T06:39:44.316Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="机器学习" scheme="https://owlsn.github.io/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>决策树</title>
+    <link href="https://owlsn.github.io/blog/2019-06-08/%E5%86%B3%E7%AD%96%E6%A0%91/"/>
+    <id>https://owlsn.github.io/blog/2019-06-08/决策树/</id>
+    <published>2019-06-08T13:29:25.000Z</published>
+    <updated>2020-04-10T08:01:23.628Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="机器学习" scheme="https://owlsn.github.io/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>线性模型</title>
+    <link href="https://owlsn.github.io/blog/2019-06-08/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/"/>
+    <id>https://owlsn.github.io/blog/2019-06-08/线性模型/</id>
+    <published>2019-06-08T08:54:37.000Z</published>
+    <updated>2020-04-07T06:39:44.316Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h3&gt;&lt;h3 id=&quot;原理&quot;&gt;&lt;a href=&quot;#原理&quot; class=&quot;headerlink&quot; title=&quot;原理&quot;&gt;&lt;/a&gt;原理&lt;/h3&gt;&lt;h3 id
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="机器学习" scheme="https://owlsn.github.io/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>极大似然估计</title>
+    <link href="https://owlsn.github.io/blog/2019-06-08/%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1/"/>
+    <id>https://owlsn.github.io/blog/2019-06-08/极大似然估计/</id>
+    <published>2019-06-08T07:14:37.000Z</published>
+    <updated>2020-04-07T06:39:44.316Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h3><p>  极大似然估计</p><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>  极大似然估计是概率论中一个很常用的估计方法，在机器学习中也有用到，比如逻辑回归中计算损失函数</p><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><h3 id="数学过程"><a href="#数学过程" class="headerlink" title="数学过程"></a>数学过程</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;主要内容&quot;&gt;&lt;a href=&quot;#主要内容&quot; class=&quot;headerlink&quot; title=&quot;主要内容&quot;&gt;&lt;/a&gt;主要内容&lt;/h3&gt;&lt;p&gt;  极大似然估计&lt;/p&gt;
+&lt;h3 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; titl
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="机器学习" scheme="https://owlsn.github.io/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>IPFS系列文章之一</title>
+    <link href="https://owlsn.github.io/blog/2018-11-07/IPFS%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E4%B9%8B%E4%B8%80/"/>
+    <id>https://owlsn.github.io/blog/2018-11-07/IPFS系列文章之一/</id>
+    <published>2018-11-07T07:18:39.000Z</published>
+    <updated>2020-04-07T06:39:44.306Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="IPFS" scheme="https://owlsn.github.io/blog/tags/IPFS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>redis源码阅读笔记</title>
+    <link href="https://owlsn.github.io/blog/2018-10-27/redis%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/"/>
+    <id>https://owlsn.github.io/blog/2018-10-27/redis源码阅读笔记/</id>
+    <published>2018-10-27T12:15:46.000Z</published>
+    <updated>2020-04-07T06:39:44.313Z</updated>
+    
+    <content type="html"><![CDATA[<p>&nbsp;&nbsp;&nbsp;&nbsp;开学已经有一段时间了，在入学之前，我本来以为我有很明确的目标，能潜心学习，但是还是被打脸了，到了这里，生活状态的转变，还是令我又一些不知所措。首先之前定的那些目标也太宽泛笼统了，另外除了有学习课程作业，还有导师安排的课题，这些干扰都打乱了我预想的节奏。如果把目标定的更细致一点，每个月，每个星期乃至每天的任务都先预先制定，这样或许能对督促我努力认真学习起到一定的效果，所以我想就从自己最想做但是一直没有做的事情开始。首先就是书籍阅读这方面，我首先确定了一本最近要开始阅读的书籍，是操作系统方面的，选这方面的书籍是因为正好和自己研究生的必修课程相关；然后就是源码阅读与实战编码这方面，这里我确定是python的requests库源码和redis的源码，选择这两个是因为在实际工作中用的非常多；最后就是博客文章这部分，写博客主要是为了在阅读了论文或者看了相关书籍之后能写一些相关的笔记，加强自己的理解和记忆；</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;开学已经有一段时间了，在入学之前，我本来以为我有很明确的目标，能潜心学习，但是还是被打脸了，到了这里，生活状态的转变，还是令我又一些不知所措。首先之前定的那些目标也太宽泛笼统了，另外除了有学习课程作业，还有导师安排的课题，这些
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="redis" scheme="https://owlsn.github.io/blog/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ip代理爬虫</title>
+    <link href="https://owlsn.github.io/blog/2018-10-06/ip%E4%BB%A3%E7%90%86%E7%88%AC%E8%99%AB/"/>
+    <id>https://owlsn.github.io/blog/2018-10-06/ip代理爬虫/</id>
+    <published>2018-10-06T02:43:24.000Z</published>
+    <updated>2020-04-07T06:39:44.308Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>  kit一个ip代理应用，代理来源于一些公开的免费代理ip网站。技术方面有使用到scrapy框架，使用到了redis去重，暂时用的mysql存储，supervisor对爬虫进程进行控制调度，日志文件暂时存在文件里，之后会考虑用数据库存储日志并进行分析。使用了tornado框架进行前端展示，bootstrap开源的前端模版adminTLE，现在只是暂时搭了架子，前端具体的内容因为还没有进行数据分析，所以以后再进行完善。在摸索的过程中，有遇到很多的问题，而且有一些还是尚未解决的，先记录下来，慢慢看。  </p><h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;写在前面&quot;&gt;&lt;a href=&quot;#写在前面&quot; class=&quot;headerlink&quot; title=&quot;写在前面&quot;&gt;&lt;/a&gt;写在前面&lt;/h3&gt;&lt;p&gt;  kit一个ip代理应用，代理来源于一些公开的免费代理ip网站。技术方面有使用到scrapy框架，使用到了redis去重，
+      
+    
+    </summary>
+    
+      <category term="学习笔记" scheme="https://owlsn.github.io/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="python" scheme="https://owlsn.github.io/blog/tags/python/"/>
+    
+  </entry>
+  
+</feed>
