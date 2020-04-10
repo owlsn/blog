@@ -70,5 +70,5 @@ theme: hueman
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:owlsn/blog.git
+  repo: git@github.com:owlsn/blog
   branch: gh-pages
