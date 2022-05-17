@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>sapi接口 | Hexo</title>
+  <meta name="description" content="写在前面　　本文转自鸟哥的博客深入理解Zend SAPIs(Zend SAPI Internals)。虽然这篇文章写了有一段时间了,但是对于直观上理解sapi还是有非常大的帮助的。   正文　　SAPI: Server abstraction API，研究过PHP架构的同学应该知道这个东东的重要性，它提供了一个接口，使得PHP可以和其他应用进行交互数据。 本文不会详细介绍每个PHP的SAPI，只是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sapi接口">
+<meta property="og:url" content="https://owlsn.github.io/blog/2016/04/05/sapi%E6%8E%A5%E5%8F%A3/index.html">
+<meta property="og:site_name" content="owlsn&#39;s blog">
+<meta property="og:description" content="写在前面　　本文转自鸟哥的博客深入理解Zend SAPIs(Zend SAPI Internals)。虽然这篇文章写了有一段时间了,但是对于直观上理解sapi还是有非常大的帮助的。   正文　　SAPI: Server abstraction API，研究过PHP架构的同学应该知道这个东东的重要性，它提供了一个接口，使得PHP可以和其他应用进行交互数据。 本文不会详细介绍每个PHP的SAPI，只是">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/php-arch.png">
+<meta property="article:published_time" content="2016-04-05T09:08:57.000Z">
+<meta property="article:modified_time" content="2022-05-17T13:26:29.346Z">
+<meta property="article:author" content="owlsn">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="c">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/php-arch.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://owlsn.github.io/blog/2016/04/05/sapi%E6%8E%A5%E5%8F%A3/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="owlsn&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/owlsn" target="_blank">
+          <img class="img-circle img-rotate" src="/blog/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">owlsn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/owlsn" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/blog/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/">个人开发</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/">个人心得</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B4%E8%B6%A3%E7%88%B1%E5%A5%BD/">兴趣爱好</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">思维导图</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E7%BB%93%E8%A7%84%E5%88%92/">总结规划</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%96%87%E7%AB%A0%E8%BD%AC%E8%BD%BD/">文章转载</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IPFS/" rel="tag">IPFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/c/" rel="tag">c</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cgi/" rel="tag">cgi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cookie/" rel="tag">cookie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cpp/" rel="tag">cpp</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/github/" rel="tag">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/go/" rel="tag">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/hexo/" rel="tag">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/html/" rel="tag">html</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/http/" rel="tag">http</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/java/" rel="tag">java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/js/" rel="tag">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/linux/" rel="tag">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/memcached/" rel="tag">memcached</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongo/" rel="tag">mongo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongodb/" rel="tag">mongodb</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/photoshop/" rel="tag">photoshop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/php/" rel="tag">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/python/" rel="tag">python</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/redis/" rel="tag">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/session/" rel="tag">session</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sketch/" rel="tag">sketch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sql/" rel="tag">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/web%E5%89%8D%E7%AB%AF/" rel="tag">web前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" rel="tag">个人开发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%A7%E5%93%81/" rel="tag">产品</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" rel="tag">推荐系统</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%A7%84%E5%88%92/" rel="tag">规划</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/blog/tags/IPFS/" style="font-size: 13px;">IPFS</a> <a href="/blog/tags/c/" style="font-size: 13px;">c</a> <a href="/blog/tags/cgi/" style="font-size: 13px;">cgi</a> <a href="/blog/tags/cookie/" style="font-size: 13px;">cookie</a> <a href="/blog/tags/cpp/" style="font-size: 13.6px;">cpp</a> <a href="/blog/tags/elasticsearch/" style="font-size: 13px;">elasticsearch</a> <a href="/blog/tags/github/" style="font-size: 13px;">github</a> <a href="/blog/tags/go/" style="font-size: 13px;">go</a> <a href="/blog/tags/hexo/" style="font-size: 13px;">hexo</a> <a href="/blog/tags/html/" style="font-size: 13px;">html</a> <a href="/blog/tags/http/" style="font-size: 13.4px;">http</a> <a href="/blog/tags/java/" style="font-size: 13px;">java</a> <a href="/blog/tags/javascript/" style="font-size: 13px;">javascript</a> <a href="/blog/tags/js/" style="font-size: 13.2px;">js</a> <a href="/blog/tags/linux/" style="font-size: 13px;">linux</a> <a href="/blog/tags/memcached/" style="font-size: 13.2px;">memcached</a> <a href="/blog/tags/mongo/" style="font-size: 13.2px;">mongo</a> <a href="/blog/tags/mongodb/" style="font-size: 13px;">mongodb</a> <a href="/blog/tags/mysql/" style="font-size: 13.2px;">mysql</a> <a href="/blog/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/blog/tags/photoshop/" style="font-size: 13px;">photoshop</a> <a href="/blog/tags/php/" style="font-size: 14px;">php</a> <a href="/blog/tags/python/" style="font-size: 13.2px;">python</a> <a href="/blog/tags/redis/" style="font-size: 13.2px;">redis</a> <a href="/blog/tags/session/" style="font-size: 13.2px;">session</a> <a href="/blog/tags/shell/" style="font-size: 13px;">shell</a> <a href="/blog/tags/sketch/" style="font-size: 13px;">sketch</a> <a href="/blog/tags/sql/" style="font-size: 13px;">sql</a> <a href="/blog/tags/web%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">web前端</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" style="font-size: 13px;">个人开发</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 13.2px;">个人总结</a> <a href="/blog/tags/%E4%BA%A7%E5%93%81/" style="font-size: 13px;">产品</a> <a href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" style="font-size: 13px;">学习笔记</a> <a href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" style="font-size: 13.2px;">推荐系统</a> <a href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 13.8px;">机器学习</a> <a href="/blog/tags/%E8%A7%84%E5%88%92/" style="font-size: 13px;">规划</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 13.2px;">设计模式</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/12/">December 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/11/">November 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/10/">October 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/06/">June 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/11/">November 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/10/">October 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/05/">May 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/04/">April 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/03/">March 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/02/">February 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/12/">December 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/03/">March 2016</a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2020/04/10/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97-1/" class="title">推荐系统系列(1)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-04-10T08:07:04.000Z" itemprop="datePublished">2020-04-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2020/01/01/sketch%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E5%92%8C%E8%B7%AF%E5%BE%84%E5%89%AA%E5%88%87/" class="title">sketch布尔运算和路径剪切</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-01-01T07:45:10.000Z" itemprop="datePublished">2020-01-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/12/07/protobuf%E5%AE%9E%E8%B7%B5/" class="title">protobuf实践</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-12-07T08:21:30.000Z" itemprop="datePublished">2019-12-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/12/03/%E6%8E%A8%E8%8D%90%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="title">推荐技术分享</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-12-03T10:44:31.000Z" itemprop="datePublished">2019-12-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/11/30/bazel%E5%AE%9E%E8%B7%B5/" class="title">bazel实践</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-11-30T08:07:58.000Z" itemprop="datePublished">2019-11-30</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-sapi接口" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      sapi接口
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/blog/2016/04/05/sapi%E6%8E%A5%E5%8F%A3/" class="article-date">
+	  <time datetime="2016-04-05T09:08:57.000Z" itemprop="datePublished">2016-04-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/blog/categories/%E6%96%87%E7%AB%A0%E8%BD%AC%E8%BD%BD/">文章转载</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/blog/tags/c/" rel="tag">c</a>, <a class="article-tag-link-link" href="/blog/tags/php/" rel="tag">php</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/blog/2016/04/05/sapi%E6%8E%A5%E5%8F%A3/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>　　本文转自鸟哥的博客<a target="_blank" rel="noopener" href="http://www.laruence.com/2008/08/12/180.html">深入理解Zend SAPIs(Zend SAPI Internals)</a>。虽然这篇文章写了有一段时间了,但是对于直观上理解sapi还是有非常大的帮助的。  </p>
+<h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><p>　　SAPI: Server abstraction API，研究过PHP架构的同学应该知道这个东东的重要性，它提供了一个接口，使得PHP可以和其他应用进行交互数据。 本文不会详细介绍每个PHP的SAPI，只是针对最简单的CGI SAPI，来说明SAPI的机制。<br>　　首先，我们来看看PHP的架构图：<br><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/php-arch.png"><br>　　SAPI提供了一个和外部通信的接口，对于PHP5.2，默认提供了很多种SAPI， 常见的给apache的mod_php5，CGI，给IIS的ISAPI，还有Shell的CLI，本文就从CGI SAPI入手 ，介绍SAPI的机制。 虽然CGI简单，但是不用担心，它包含了绝大部分内容，足以让你深刻理解SAPI的工作原理。<br>　　要定义个SAPI，首先要定义个sapi_module_struct, 查看 PHP-SRC/sapi/cgi/cgi_main.c:  </p>
+<pre><code> */
+static sapi_module_struct cgi_sapi_module = &#123;
+#if PHP_FASTCGI
+    &quot;cgi-fcgi&quot;,                     /* name */
+    &quot;CGI/FastCGI&quot;,                  /* pretty name */
+#else
+    &quot;cgi&quot;,                          /* name */
+    &quot;CGI&quot;,                          /* pretty name */
+#endif
+ 
+    php_cgi_startup,                /* startup */
+    php_module_shutdown_wrapper,    /* shutdown */
+ 
+    NULL,                           /* activate */
+    sapi_cgi_deactivate,            /* deactivate */
+ 
+    sapi_cgibin_ub_write,           /* unbuffered write */
+    sapi_cgibin_flush,              /* flush */
+    NULL,                           /* get uid */
+    sapi_cgibin_getenv,             /* getenv */
+ 
+    php_error,                      /* error handler */
+ 
+    NULL,                           /* header handler */
+    sapi_cgi_send_headers,          /* send headers handler */
+    NULL,                           /* send header handler */
+ 
+    sapi_cgi_read_post,             /* read POST data */
+    sapi_cgi_read_cookies,          /* read Cookies */
+ 
+    sapi_cgi_register_variables,    /* register server variables */
+    sapi_cgi_log_message,           /* Log message */
+    NULL,                           /* Get request time */
+ 
+    STANDARD_SAPI_MODULE_PROPERTIES
+&#125;;  
+</code></pre>
+<p>　　这个结构，包含了一些常量，比如name, 这个会在我们调用php_info()的时候被使用。一些初始化，收尾函数，以及一些函数指针，用来告诉Zend，如何获取，和输出数据。<br>　　1. php_cgi_startup， 当一个应用要调用PHP的时候，这个函数会被调用，对于CGI来说，它只是简单的调用了PHP的初始化函数：　　</p>
+<pre><code>static int php_cgi_startup(sapi_module_struct *sapi_module)
+&#123;
+    if (php_module_startup(sapi_module, NULL, 0) == FAILURE) &#123;
+        return FAILURE;
+    &#125;
+    return SUCCESS;
+&#125;  
+</code></pre>
+<p>　　2. php_module_shutdown_wrapper ， 一个对PHP关闭函数的简单包装。只是简单的调用php_module_shutdown;<br>　　3. PHP会在每个request的时候，处理一些初始化，资源分配的事务。这部分就是activate字段要定义的，从上面的结构我们可以看出，对于CGI来说，它并没有提供初始化处理句柄。对于mod_php来说，那就不同了，他要在apache的pool中注册资源析构函数， 申请空间， 初始化环境变量，等等等等。<br>　　4. sapi_cgi_deactivate, 这个是对应与activate的函数，顾名思义，它会提供一个handler, 用来处理收尾工作，对于CGI来说，他只是简单的刷新缓冲区，用以保证用户在Zend关闭前得到所有的输出数据：  </p>
+<pre><code>static int sapi_cgi_deactivate(TSRMLS_D)
+&#123;
+    /* flush only when SAPI was started. The reasons are:
+        1. SAPI Deactivate is called from two places: module init and request shutdown
+        2. When the first call occurs and the request is not set up, flush fails on
+            FastCGI.
+    */
+    if (SG(sapi_started)) &#123;
+        sapi_cgibin_flush(SG(server_context));
+    &#125;
+    return SUCCESS;
+&#125;  
+</code></pre>
+<p>　　5. sapi_cgibin_ub_write, 这个hanlder告诉了Zend，如何输出数据，对于mod_php来说，这个函数提供了一个向response数据写的接口，而对于CGI来说，只是简单的写到stdout：  </p>
+<pre><code>static inline size_t sapi_cgibin_single_write(const char *str, uint str_length TSRMLS_DC)
+&#123;
+#ifdef PHP_WRITE_STDOUT
+    long ret;
+#else
+    size_t ret;
+#endif
+ 
+#if PHP_FASTCGI
+    if (fcgi_is_fastcgi()) &#123;
+        fcgi_request *request = (fcgi_request*) SG(server_context);
+        long ret = fcgi_write(request, FCGI_STDOUT, str, str_length);
+        if (ret &lt;= 0) &#123;
+            return 0;
+        &#125;
+        return ret;
+    &#125;
+#endif
+#ifdef PHP_WRITE_STDOUT
+    ret = write(STDOUT_FILENO, str, str_length);
+    if (ret &lt;= 0) return 0;
+    return ret;
+#else
+    ret = fwrite(str, 1, MIN(str_length, 16384), stdout);
+    return ret;
+#endif
+&#125;
+ 
+static int sapi_cgibin_ub_write(const char *str, uint str_length TSRMLS_DC)
+&#123;
+    const char *ptr = str;
+    uint remaining = str_length;
+    size_t ret;
+ 
+    while (remaining &gt; 0) &#123;
+        ret = sapi_cgibin_single_write(ptr, remaining TSRMLS_CC);
+        if (!ret) &#123;
+            php_handle_aborted_connection();
+            return str_length - remaining;
+        &#125;
+        ptr += ret;
+        remaining -= ret;
+    &#125;
+ 
+    return str_length;
+&#125;  
+</code></pre>
+<p>　　把真正的写的逻辑剥离出来，就是为了简单实现兼容fastcgi的写方式。<br>　　6. sapi_cgibin_flush, 这个是提供给zend的刷新缓存的函数句柄，对于CGI来说，只是简单的调用系统提供的fflush;<br>　　7. NULL， 这部分用来让Zend可以验证一个要执行脚本文件的state，从而判断文件是否据有执行权限等等，CGI没有提供。<br>　　8. sapi_cgibin_getenv, 为Zend提供了一个根据name来查找环境变量的接口，对于mod_php5来说，当我们在脚本中调用getenv的时候，就会间接的调用这个句柄。而对于CGI来说，因为他的运行机制和CLI很类似，直接调用父级是Shell， 所以，只是简单的调用了系统提供的genenv:</p>
+<pre><code>static char *sapi_cgibin_getenv(char *name, size_t name_len TSRMLS_DC)
+&#123;
+#if PHP_FASTCGI
+    /* when php is started by mod_fastcgi, no regular environment
+       is provided to PHP.  It is always sent to PHP at the start
+       of a request.  So we have to do our own lookup to get env
+       vars.  This could probably be faster somehow.  */
+    if (fcgi_is_fastcgi()) &#123;
+        fcgi_request *request = (fcgi_request*) SG(server_context);
+        return fcgi_getenv(request, name, name_len);
+    &#125;
+#endif
+    /*  if cgi, or fastcgi and not found in fcgi env
+        check the regular environment */
+    return getenv(name);
+&#125;  
+</code></pre>
+<p>　　9. php_error, 错误处理函数, 到这里，说几句题外话，上次看到php maillist 提到的使得PHP的错误处理机制完全OO化， 也就是，改写这个函数句柄，使得每当有错误发生的时候，都throw一个异常。而CGI只是简单的调用了PHP提供的错误处理函数。<br>　　10. 这个函数会在我们调用PHP的header()函数的时候被调用，对于CGI来说，不提供。<br>　　11. sapi_cgi_send_headers, 这个函数会在要真正发送header的时候被调用，一般来说，就是当有任何的输出要发送之前：  </p>
+<pre><code>static int sapi_cgi_send_headers(sapi_headers_struct *sapi_headers TSRMLS_DC)
+&#123;
+    char buf[SAPI_CGI_MAX_HEADER_LENGTH];
+    sapi_header_struct *h;
+    zend_llist_position pos;
+ 
+    if (SG(request_info).no_headers == 1) &#123;
+        return  SAPI_HEADER_SENT_SUCCESSFULLY;
+    &#125;
+ 
+    if (cgi_nph || SG(sapi_headers).http_response_code != 200)
+    &#123;
+        int len;
+ 
+        if (rfc2616_headers &amp;&amp; SG(sapi_headers).http_status_line) &#123;
+            len = snprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH,
+                           &quot;%s\r\n&quot;, SG(sapi_headers).http_status_line);
+ 
+            if (len &gt; SAPI_CGI_MAX_HEADER_LENGTH) &#123;
+                len = SAPI_CGI_MAX_HEADER_LENGTH;
+            &#125;
+ 
+        &#125; else &#123;
+            len = sprintf(buf, &quot;Status: %d\r\n&quot;, SG(sapi_headers).http_response_code);
+        &#125;
+ 
+        PHPWRITE_H(buf, len);
+    &#125;
+ 
+    h = (sapi_header_struct*)zend_llist_get_first_ex(&amp;sapi_headers-&gt;headers, &amp;pos);
+    while (h) &#123;
+        /* prevent CRLFCRLF */
+        if (h-&gt;header_len) &#123;
+            PHPWRITE_H(h-&gt;header, h-&gt;header_len);
+            PHPWRITE_H(&quot;\r\n&quot;, 2);
+        &#125;
+        h = (sapi_header_struct*)zend_llist_get_next_ex(&amp;sapi_headers-&gt;headers, &amp;pos);
+    &#125;
+    PHPWRITE_H(&quot;\r\n&quot;, 2);
+ 
+    return SAPI_HEADER_SENT_SUCCESSFULLY;
+&#125;  
+</code></pre>
+<p>　　12. NULL, 这个用来单独发送每一个header, CGI没有提供<br>　　13. sapi_cgi_read_post, 这个句柄指明了如何获取POST的数据，如果做过CGI编程的话，我们就知道CGI是从stdin中读取POST DATA的，  </p>
+<pre><code>static int sapi_cgi_read_post(char *buffer, uint count_bytes TSRMLS_DC)
+&#123;
+    uint read_bytes=0, tmp_read_bytes;
+#if PHP_FASTCGI
+    char *pos = buffer;
+#endif
+ 
+    count_bytes = MIN(count_bytes, (uint) SG(request_info).content_length - SG(read_post_bytes));
+    while (read_bytes &lt; count_bytes) &#123;
+#if PHP_FASTCGI
+        if (fcgi_is_fastcgi()) &#123;
+            fcgi_request *request = (fcgi_request*) SG(server_context);
+            tmp_read_bytes = fcgi_read(request, pos, count_bytes - read_bytes);
+            pos += tmp_read_bytes;
+        &#125; else &#123;
+            tmp_read_bytes = read(0, buffer + read_bytes, count_bytes - read_bytes);
+        &#125;
+#else
+        tmp_read_bytes = read(0, buffer + read_bytes, count_bytes - read_bytes);
+#endif
+ 
+        if (tmp_read_bytes &lt;= 0) &#123;
+            break;
+        &#125;
+        read_bytes += tmp_read_bytes;
+    &#125;
+    return read_bytes;
+&#125;  
+</code></pre>
+<p>　　14. sapi_cgi_read_cookies, 这个和上面的函数一样，只不过是去获取cookie值：  </p>
+<pre><code>static char *sapi_cgi_read_cookies(TSRMLS_D)
+&#123;
+    return sapi_cgibin_getenv((char *) &quot;HTTP_COOKIE&quot;, sizeof(&quot;HTTP_COOKIE&quot;)-1 TSRMLS_CC);
+&#125;  
+</code></pre>
+<p>　　15. sapi_cgi_register_variables, 这个函数给了一个接口，用以给$_SERVER变量中添加变量，对于CGI来说，注册了一个PHP_SELF,这样我们就可以在脚本中访问$_SERVER[‘PHP_SELF’]来获取本次的request_uri：  </p>
+<pre><code>static void sapi_cgi_register_variables(zval *track_vars_array TSRMLS_DC)
+&#123;
+    /* In CGI mode, we consider the environment to be a part of the server
+     * variables
+     */
+    php_import_environment_variables(track_vars_array TSRMLS_CC);
+    /* Build the special-case PHP_SELF variable for the CGI version */
+    php_register_variable(&quot;PHP_SELF&quot;, (SG(request_info).request_uri ? SG(request_info).request_uri : &quot;&quot;), track_vars_array TSRMLS_CC);
+&#125;  
+</code></pre>
+<p>　　16. sapi_cgi_log_message ，用来输出错误信息，对于CGI来说，只是简单的输出到stderr:  </p>
+<pre><code>static void sapi_cgi_log_message(char *message)
+&#123;
+#if PHP_FASTCGI
+    if (fcgi_is_fastcgi() &amp;&amp; fcgi_logging) &#123;
+        fcgi_request *request;
+        TSRMLS_FETCH();
+ 
+        request = (fcgi_request*) SG(server_context);
+        if (request) &#123;
+            int len = strlen(message);
+            char *buf = malloc(len+2);
+ 
+            memcpy(buf, message, len);
+            memcpy(buf + len, &quot;\n&quot;, sizeof(&quot;\n&quot;));
+            fcgi_write(request, FCGI_STDERR, buf, len+1);
+            free(buf);
+        &#125; else &#123;
+            fprintf(stderr, &quot;%s\n&quot;, message);
+        &#125;
+        /* ignore return code */
+    &#125; else
+#endif /* PHP_FASTCGI */
+    fprintf(stderr, &quot;%s\n&quot;, message);
+&#125;  
+</code></pre>
+<p>　　经过分析，我们已经了解了一个SAPI是如何实现的了， 分析过CGI以后，我们也就可以想象mod_php, embed等SAPI的实现机制。 ：）</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>　　<a target="_blank" rel="noopener" href="http://www.php-internals.com/">深入理解PHP内核</a><br>　　<a target="_blank" rel="noopener" href="http://www.laruence.com/2008/08/12/180.html">深入理解Zend SAPIs(Zend SAPI Internals)</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://owlsn.github.io/blog/2016/04/05/sapi%E6%8E%A5%E5%8F%A3/" title="sapi接口" target="_blank" rel="external">https://owlsn.github.io/blog/2016/04/05/sapi接口/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/owlsn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/blog/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/owlsn" target="_blank"><span class="text-dark">owlsn</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/blog/2016/12/27/mongodb%E7%9A%84%E4%B8%80%E4%BA%9B%E8%81%9A%E5%90%88%E6%9F%A5%E8%AF%A2%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/" title="mongodb的一些常用查询方法总结"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/blog/2016/04/04/php%E7%AF%87-include_path/" title="php篇-include_path"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/owlsn" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/blog/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/blog/js/plugin.min.js"></script>
+
+
+<script src="/blog/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/blog/',
+        CONTENT_URL: '/blog/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/blog/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>http协议学习笔记 | Hexo</title>
+  <meta name="description" content="写在前面　　http协议是非常基础的东西,在大学里的计算机网络课程里面就有提到过这方面的内容,不过就略微提到了一下，之后我自己看了《http权威指南》中的一部分内容,写这篇文章的时候还没有完全看完,后来又在网上查找了一些资料，然后这里我就简单地做了一些总结，好方便理解并且加深自己的记忆。   http协议简要介绍　　超文本传输协议（英文：HyperText Transfer Protocol，缩写">
+<meta property="og:type" content="article">
+<meta property="og:title" content="http协议学习笔记">
+<meta property="og:url" content="https://owlsn.github.io/blog/2016/02/25/http%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="owlsn&#39;s blog">
+<meta property="og:description" content="写在前面　　http协议是非常基础的东西,在大学里的计算机网络课程里面就有提到过这方面的内容,不过就略微提到了一下，之后我自己看了《http权威指南》中的一部分内容,写这篇文章的时候还没有完全看完,后来又在网上查找了一些资料，然后这里我就简单地做了一些总结，好方便理解并且加深自己的记忆。   http协议简要介绍　　超文本传输协议（英文：HyperText Transfer Protocol，缩写">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_process.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_stacks_vs_https_stacks.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/tcp_connection.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/request_header.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/response_header.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_cache.png">
+<meta property="article:published_time" content="2016-02-25T10:43:12.000Z">
+<meta property="article:modified_time" content="2022-05-17T13:26:29.345Z">
+<meta property="article:author" content="owlsn">
+<meta property="article:tag" content="http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_process.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://owlsn.github.io/blog/2016/02/25/http%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="owlsn&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/owlsn" target="_blank">
+          <img class="img-circle img-rotate" src="/blog/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">owlsn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/owlsn" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/blog/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/">个人开发</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E4%B8%AA%E4%BA%BA%E5%BF%83%E5%BE%97/">个人心得</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B4%E8%B6%A3%E7%88%B1%E5%A5%BD/">兴趣爱好</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/">思维导图</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%80%BB%E7%BB%93%E8%A7%84%E5%88%92/">总结规划</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%96%87%E7%AB%A0%E8%BD%AC%E8%BD%BD/">文章转载</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">环境搭建</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/IPFS/" rel="tag">IPFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/c/" rel="tag">c</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cgi/" rel="tag">cgi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cookie/" rel="tag">cookie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/cpp/" rel="tag">cpp</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/github/" rel="tag">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/go/" rel="tag">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/hexo/" rel="tag">hexo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/html/" rel="tag">html</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/http/" rel="tag">http</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/java/" rel="tag">java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/js/" rel="tag">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/linux/" rel="tag">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/memcached/" rel="tag">memcached</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongo/" rel="tag">mongo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mongodb/" rel="tag">mongodb</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/mysql/" rel="tag">mysql</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/nginx/" rel="tag">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/photoshop/" rel="tag">photoshop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/php/" rel="tag">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/python/" rel="tag">python</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/redis/" rel="tag">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/session/" rel="tag">session</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/shell/" rel="tag">shell</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sketch/" rel="tag">sketch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/sql/" rel="tag">sql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/web%E5%89%8D%E7%AB%AF/" rel="tag">web前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" rel="tag">个人开发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" rel="tag">个人总结</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E4%BA%A7%E5%93%81/" rel="tag">产品</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag">学习笔记</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" rel="tag">推荐系统</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%A7%84%E5%88%92/" rel="tag">规划</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag">设计模式</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/blog/tags/IPFS/" style="font-size: 13px;">IPFS</a> <a href="/blog/tags/c/" style="font-size: 13px;">c</a> <a href="/blog/tags/cgi/" style="font-size: 13px;">cgi</a> <a href="/blog/tags/cookie/" style="font-size: 13px;">cookie</a> <a href="/blog/tags/cpp/" style="font-size: 13.6px;">cpp</a> <a href="/blog/tags/elasticsearch/" style="font-size: 13px;">elasticsearch</a> <a href="/blog/tags/github/" style="font-size: 13px;">github</a> <a href="/blog/tags/go/" style="font-size: 13px;">go</a> <a href="/blog/tags/hexo/" style="font-size: 13px;">hexo</a> <a href="/blog/tags/html/" style="font-size: 13px;">html</a> <a href="/blog/tags/http/" style="font-size: 13.4px;">http</a> <a href="/blog/tags/java/" style="font-size: 13px;">java</a> <a href="/blog/tags/javascript/" style="font-size: 13px;">javascript</a> <a href="/blog/tags/js/" style="font-size: 13.2px;">js</a> <a href="/blog/tags/linux/" style="font-size: 13px;">linux</a> <a href="/blog/tags/memcached/" style="font-size: 13.2px;">memcached</a> <a href="/blog/tags/mongo/" style="font-size: 13.2px;">mongo</a> <a href="/blog/tags/mongodb/" style="font-size: 13px;">mongodb</a> <a href="/blog/tags/mysql/" style="font-size: 13.2px;">mysql</a> <a href="/blog/tags/nginx/" style="font-size: 13px;">nginx</a> <a href="/blog/tags/photoshop/" style="font-size: 13px;">photoshop</a> <a href="/blog/tags/php/" style="font-size: 14px;">php</a> <a href="/blog/tags/python/" style="font-size: 13.2px;">python</a> <a href="/blog/tags/redis/" style="font-size: 13.2px;">redis</a> <a href="/blog/tags/session/" style="font-size: 13.2px;">session</a> <a href="/blog/tags/shell/" style="font-size: 13px;">shell</a> <a href="/blog/tags/sketch/" style="font-size: 13px;">sketch</a> <a href="/blog/tags/sql/" style="font-size: 13px;">sql</a> <a href="/blog/tags/web%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">web前端</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91/" style="font-size: 13px;">个人开发</a> <a href="/blog/tags/%E4%B8%AA%E4%BA%BA%E6%80%BB%E7%BB%93/" style="font-size: 13.2px;">个人总结</a> <a href="/blog/tags/%E4%BA%A7%E5%93%81/" style="font-size: 13px;">产品</a> <a href="/blog/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/blog/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" style="font-size: 13px;">学习笔记</a> <a href="/blog/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" style="font-size: 13.2px;">推荐系统</a> <a href="/blog/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 13.8px;">机器学习</a> <a href="/blog/tags/%E8%A7%84%E5%88%92/" style="font-size: 13px;">规划</a> <a href="/blog/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size: 13.2px;">设计模式</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/12/">December 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/11/">November 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/10/">October 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/06/">June 2019</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/11/">November 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/10/">October 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/05/">May 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/04/">April 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/03/">March 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/02/">February 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/12/">December 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/03/">March 2016</a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/">推荐系统</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2020/04/10/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97-1/" class="title">推荐系统系列(1)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-04-10T08:07:04.000Z" itemprop="datePublished">2020-04-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E8%AE%BE%E8%AE%A1/">设计</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2020/01/01/sketch%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E5%92%8C%E8%B7%AF%E5%BE%84%E5%89%AA%E5%88%87/" class="title">sketch布尔运算和路径剪切</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-01-01T07:45:10.000Z" itemprop="datePublished">2020-01-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/12/07/protobuf%E5%AE%9E%E8%B7%B5/" class="title">protobuf实践</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-12-07T08:21:30.000Z" itemprop="datePublished">2019-12-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%BF%83%E5%BE%97%E5%88%86%E4%BA%AB/">心得分享</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/12/03/%E6%8E%A8%E8%8D%90%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="title">推荐技术分享</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-12-03T10:44:31.000Z" itemprop="datePublished">2019-12-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+              </p>
+              <p class="item-title">
+                <a href="/blog/2019/11/30/bazel%E5%AE%9E%E8%B7%B5/" class="title">bazel实践</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-11-30T08:07:58.000Z" itemprop="datePublished">2019-11-30</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-http协议学习笔记" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      http协议学习笔记
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/blog/2016/02/25/http%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="article-date">
+	  <time datetime="2016-02-25T10:43:12.000Z" itemprop="datePublished">2016-02-25</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/blog/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/blog/tags/http/" rel="tag">http</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/blog/2016/02/25/http%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>　　http协议是非常基础的东西,在大学里的计算机网络课程里面就有提到过这方面的内容,不过就略微提到了一下，之后我自己看了《http权威指南》中的一部分内容,写这篇文章的时候还没有完全看完,后来又在网上查找了一些资料，然后这里我就简单地做了一些总结，好方便理解并且加深自己的记忆。  </p>
+<h3 id="http协议简要介绍"><a href="#http协议简要介绍" class="headerlink" title="http协议简要介绍"></a>http协议简要介绍</h3><p>　　超文本传输协议（英文：HyperText Transfer Protocol，缩写：HTTP）是互联网上应用最为广泛的一种应用层的网络协议。  </p>
+<h3 id="http事务"><a href="#http事务" class="headerlink" title="http事务"></a>http事务</h3><p>　　一个 HTTP 事务由一条（从客户端发往服务器的）请求命令和一个（从服务器 发回客户端的）响应结果组成。这种通信是通过名为 HTTP 报文（HTTP message） 的格式化数据块进行的。  </p>
+<span id="more"></span>
+<p><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_process.png"><br>　　http事务的一次工作流程一般可以分为四个步骤:<br>　　1）首先客户机与服务器需要建立连接。HTTP 是个应用层协议,HTTP 无需操心网络通信的具体细节;它把网络传输的的具体过程都交给了通用、可靠的因特网传输协议 TCP/IP。<br>　　2）建立连接后，客户机发送一个请求给服务器，请求方式要符合http报文的格式,里面一般包括请求的方法,资源,资源MIME类型,主机地址以及一些其他参数。<br>　　3）服务器接到请求后，给予相应的响应信息。响应信息也是按照响应报文的格式来组织的。这条响应中一般包含了 HTTP 的版本号,成功状态码,一个描述性的原因短语,以及一块响应首部字段，在所有这些内容之后跟着包含了所请求文档的响应主体。<br>　　4）客户端接收服务器所返回的信息,然后客户机与服务器断开连接。 如果在以上过程中的某一步出现错误，那么产生错误的信息将返回到客户端。  </p>
+<h4 id="http连接和TCP-IP协议"><a href="#http连接和TCP-IP协议" class="headerlink" title="http连接和TCP/IP协议"></a>http连接和TCP/IP协议</h4><p>　　http网络协议栈(https是http的安全版本):<br><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_stacks_vs_https_stacks.png"><br>　　http协议在发送请求报文之前,需要用网际协议（Internet Protocol，IP） 地址和端口号在客户端和服务器之间建立一条 TCP/IP 连接,在 TCP 中，你需要知道服务器的 IP 地址，以及与服务器上运行的特定软件相关的 TCP 端口号,而获取http服务器的IP地址和端口号就要通过URL了。而这个步骤可以概括为:<br>　　1) 浏览器从URL中解析出服务器的主机名;<br>　　2) 浏览器将服务器的主机名转换成服务器的 IP 地址(域名解析);<br>　　3) 浏览器将端口号(如果有的话)从URL中解析出来;<br>　　4) 浏览器建立一条与Web服务器的TCP连接;<br>　　有关TCP连接的一些知识,在《http权威指南》一书的第四章有详细的介绍,这里我简单地做了一些记录笔记:HTTP 要传送一条报文时，会以流的形式将报文数据的内容通过一条打开的TCP连接按序传输。TCP收到数据流之后，会将数据流砍成被称作段的小数据块并将段封装在IP分组中通过因特网进行传输。所有这些工作都是由TCP/IP软件来处理的,这一过程对于HTTP程序员来说是透明的。每个TCP段都是由IP分组承载从一个IP地址发送到另一个IP地址的。每个IP分组中都包括:<br>　　1) 一个IP分组首部(通常为 20 字节)<br>　　2) 一个TCP段首部(通常为 20 字节)<br>　　3) 一个 TCP 数据块(0 个或多个字节)<br>　　IP首部包含了源和目的IP地址,长度和其他一些标记。TCP段的首部包含了TCP端口号,TCP控制标记,以及用于数据排序和完整性检查的一些数字值。<br>　　TCP连接握手:<br>　　TCP连接握手需要经过以下几个步骤:<br>　　1)请求新的TCP连接时，客户端要向服务器发送一个小的TCP分组(通常是40～60个字节)。这个分组中设置了一个特殊的SYN标记,说明这是一个连接请求。<br>　　2)如果服务器接受了连接,就会对一些连接参数进行计算,并向客户端回送一个 TCP分组,这个分组中的SYN和ACK标记都被置位,说明连接请求已被接受。<br>　　3)最后,客户端向服务器回送一条确认信息,通知它连接已成功建立。如下图:<br><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/tcp_connection.png">  </p>
+<h4 id="http报文"><a href="#http报文" class="headerlink" title="http报文"></a>http报文</h4><p>　　HTTP报文是在HTTP应用程序之间发送的格式化的数据块。这些数据块以一些文本形式的元信息(meta-information)开头,这些信息描述了报文的内容及含义,后面跟着可选的数据部分。这些报文在客户端,服务器和代理之间流动。每条报文都包含一 条来自客户端的请求,或者一条来自服务器的响应。它们由三个部分组成:对报文进行描述的起始行(start line),包含属性的首部(header)块,以及可选的,包含数据的主体(body)部分。所有的HTTP报文都可以分为两类:请求报文(request message)和响应报文(response message)。请求报文会向Web服务器请求一个动作。响应报文会将请求的结果返回给客户端。请求和响应报文的基本报文结构相同。<br>　　这是请求报文的格式:<br>　　&lt; method&gt; &lt; request-URL&gt; &lt; version&gt;<br>　　&lt; headers&gt;<br>　　&lt; entity-body&gt;<br>　　这是响应报文的格式(只有起始行的语法有所不同):<br>　　&lt; version&gt; &lt; status&gt; &lt; reason-phrase&gt;<br>　　&lt; headers&gt;<br>　　&lt; entity-body&gt;<br>　　例如:访问<a href="http://owlsn.github.io/blog">http://owlsn.github.io/blog</a> ,在谷歌浏览器中查看请求报文头部:<br><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/request_header.png"><br>　　查看响应报文头部:<br><img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/response_header.png"><br>　　其中请求报文主体部分没有参数或者其他内容,所以主体部分为空,而响应报文主体部分就是整个网页的html代码部分。<br>　　以下是对各部分的描述:<br>　　1) 方法(method)<br>　　客户端希望服务器对资源执行的动作。是一个单独的词，比如 GET、HEAD 或 POST。<br>　　2) 请求URL(request-URL)<br>　　命名了所请求资源，或者 URL 路径组件的完整 URL。如果直接与服务器进行对 话，只要 URL 的路径组件是资源的绝对路径，通常就不会有什么问题——服务 器可以假定自己是URL的主机:端口。<br>　　3) 版本(version)<br>　　报文所使用的HTTP版本,其格式看起来是这样的:HTTP/&lt; major&gt;.&lt; minor&gt;<br>其中主要版本号(major)和次要版本号(minor)都是整数。<br>　　4) 状态码(status-code)<br>　　这三位数字描述了请求过程中所发生的情况。每个状态码的第一位数字都用于描 述状态的一般类别(“成功”、“出错”等)。<br>　　5) 原因短语(reason-phrase)<br>　　数字状态码的可读版本，包含行终止序列之前的所有文本。原因短语只对人类有意义,因此,比如说,尽管响应行 HTTP/1.0 200 NOT OK 和 HTTP/1.0 200 OK 中原因短语的含义不同,但同样都会被当作成功指示处理。<br>　　6) 首部(header)<br>　　可以有零个或多个首部,每个首部都包含一个名字,后面跟着一个冒号(:),然后是一个可选的空格,接着是一个值,最后是一个 CRLF。首部是由一个空行(CRLF)结束的,表示了首部列表的结束和实体主体部分的开始。有些HTTP版本,比如HTTP/1.1,要求有效的请求或响应报文中必须包含特定的首部。<br>　　7) 实体的主体部分(entity-body)<br>　　实体的主体部分包含一个由任意数据组成的数据块。并不是所有的报文都包含实体的主体部分,有时,报文只是以一个 CRLF 结束。<br>　　在请求和响应报文中都可以用首部来提供信息，有些首部是某种报文专用的，有些 首部则更通用一些。可以将首部分为五个主要的类型:通用首部,请求首部,响应首部,实体首部,扩展首部。具体的一些首部的含义可以查阅相关的技术手册。  </p>
+<h3 id="web缓存"><a href="#web缓存" class="headerlink" title="web缓存"></a>web缓存</h3><p>　　Web缓存是可以自动保存常见文档副本的HTTP设备。当Web请求抵达缓存时，如果本地有“已缓存的”副本，就可以从本地存储设备而不是原始服务器中提取这个文档。使用缓存有下列优点:<br>　　1) 缓存减少了冗余的数据传输，节省了你的网络费用。<br>　　2) 缓存缓解了网络瓶颈的问题。不需要更多的带宽就能够更快地加载页面。<br>　　3) 缓存降低了对原始服务器的要求。服务器可以更快地响应，避免过载的出现。<br>　　4) 缓存降低了距离时延，因为从较远的地方加载页面会更慢一些。  </p>
+<h4 id="http缓存处理步骤"><a href="#http缓存处理步骤" class="headerlink" title="http缓存处理步骤"></a>http缓存处理步骤</h4><p>　　现代的商业化代理缓存相当地复杂。这些缓存构建得非常高效，可以支持 HTTP 和 其他一些技术的各种高级特性。但除了一些微妙的细节之外，Web 缓存的基本工作 原理大多很简单。对一条 HTTP GET报文的基本缓存处理过程包括7个步骤。<br>　　1) 接收——缓存从网络中读取抵达的请求报文。<br>　　2) 解析——缓存对报文进行解析，提取出 URL 和各种首部。<br>　　3) 查询——缓存查看是否有本地副本可用，如果没有，就获取一份副本（并将其保 存在本地）。<br>　　4) 新鲜度检测——缓存查看已缓存副本是否足够新鲜，如果不是，就询问服务器是 否有任何更新。<br>　　5) 创建响应——缓存会用新的首部和已缓存的主体来构建一条响应报文。<br>　　6) 发送——缓存通过网络将响应发回给客户端。<br>　　7) 日志——缓存可选地创建一个日志文件条目来描述这个事务。<br>　　HTTP有一些简单的机制可以在不要求服务器记住有哪些缓存拥有其文档副本的情况下，保持已缓存数据与服务器数据之间充分一致。HTTP 将这些简单的机制称为文档过期（document expiration）和服务器再验证（server revalidation）,<br>通过特殊的HTTP Cache-Control首部和Expires首部,HTTP让原始服务器向每个文档附加了一个“过期日期”。<br>　　<br> <img src="https://raw.githubusercontent.com/owlsn/blog/master/source/source/http_cache.png">   </p>
+<h4 id="文档过期（document-expiration）和服务器再验证（server-revalidation）"><a href="#文档过期（document-expiration）和服务器再验证（server-revalidation）" class="headerlink" title="文档过期（document expiration）和服务器再验证（server revalidation）"></a>文档过期（document expiration）和服务器再验证（server revalidation）</h4><p>　　HTTP 有一些简单的机制可以在不要求服务器记住有哪些缓存拥有其文档副本的情况下，保持已缓存数据与服务器数据之间充分一致。HTTP 将这些简单的机制称为文档过期（document expiration）和服务器再验证（server revalidation）。  </p>
+<h4 id="新鲜度和缓存控制首部"><a href="#新鲜度和缓存控制首部" class="headerlink" title="新鲜度和缓存控制首部"></a>新鲜度和缓存控制首部</h4><p>　　服务器应当告知客户端能够将内容缓存多长时间，在这个时间之内就是新鲜的,文档还未过期。 服务器可以用这两个首部之一来提供这种信息：Expires（过期）和 Cache－Control（缓存控制）。<br>　　下表列出了一些有关Cache-Control首部的一些参数:  </p>
+<table>
+<thead>
+<tr>
+<th>首部</th>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>no-cache</td>
+<td>请求</td>
+<td>在重新向服务器验证之前，不要返回文档的缓存副本</td>
+</tr>
+<tr>
+<td>no-store</td>
+<td>请求</td>
+<td>不要返回文档的缓存副本。不要保存服务器的响应</td>
+</tr>
+<tr>
+<td>max-age</td>
+<td>请求</td>
+<td>缓存中的文档不能超过指定的使用期</td>
+</tr>
+<tr>
+<td>max-stale</td>
+<td>请求</td>
+<td>文档允许过期（根据服务器提供的过期信息计算），但不能超过 指令中指定的过期值</td>
+</tr>
+<tr>
+<td>min-fresh</td>
+<td>请求</td>
+<td>文档的使用期不能小于这个指定的时间与它的当前存活时间之 和。换句话说，响应必须至少在指定的这段时间之内保持新鲜</td>
+</tr>
+<tr>
+<td>no-transform</td>
+<td>请求</td>
+<td>文档在发送之前不允许被转换</td>
+</tr>
+<tr>
+<td>only-if-cached</td>
+<td>请求</td>
+<td>只有当文档在缓存中才发送，不要联系原始服务器</td>
+</tr>
+<tr>
+<td>public</td>
+<td>响应</td>
+<td>响应可以被任何服务器缓存</td>
+</tr>
+<tr>
+<td>private</td>
+<td>响应</td>
+<td>响应可以被缓存，但只能被单个客户端访问</td>
+</tr>
+<tr>
+<td>no-cache</td>
+<td>响应</td>
+<td>如果该指令伴随一个首部列表的话，那么内容可以被缓存并提 供给客户端，但必须先删除所列出的首部。如果没有指定首部， 缓存中的副本在没有重新向服务器验证之前不能提供给客户端</td>
+</tr>
+<tr>
+<td>no-store</td>
+<td>响应</td>
+<td>响应不允许被缓存</td>
+</tr>
+<tr>
+<td>no-transform</td>
+<td>响应</td>
+<td>响应在提供给客户端之前不能做任何形式的修改</td>
+</tr>
+<tr>
+<td>must-revalidate</td>
+<td>响应</td>
+<td>响应在提供给客户端之前必须重新向服务器验证</td>
+</tr>
+<tr>
+<td>proxy-revalidate</td>
+<td>响应</td>
+<td>共享的缓存在提供给客户端之前必须重新向原始服务器验证。 私有的缓存可以忽略这条指令</td>
+</tr>
+<tr>
+<td>max-age</td>
+<td>响应</td>
+<td>指定文档可以被缓存的时间以及新鲜度的最长时间</td>
+</tr>
+<tr>
+<td>s-max-age</td>
+<td>响应</td>
+<td>指定文档作为共享缓存时的最长使用时间（如果有 max-age 指 令的话，以本指令为准）。私有的缓存可以忽略本指令</td>
+</tr>
+<tr>
+<td>此外还有Etag首部和Expires首部,Expires首部指定的是实际的过期日期而不是秒数。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="有条件的请求和验证码"><a href="#有条件的请求和验证码" class="headerlink" title="有条件的请求和验证码"></a>有条件的请求和验证码</h4><p>　　当文档在客户端“过期”之后（也就是说，客户端不再认为该副本有效），客户端必须从服务器请求一份新的副本。不过，如果该文档在服务器上并未发生改变，客户 端也就不需要再接收一次了——继续使用缓存的副本即可。这种特殊的请求，称为有条件的请求（conditional request）,要求客户端使用验证（validator）来告知服务器它当前拥有的版本号，并仅当它的当前副本不再有效时才要求发送新的副本。<br>　　每个有条件的请求都通过特定的验证码来发挥作用。验证码是文档实例的一个特殊 属性，用它来测试条件是否为真。从概念上说，你可以把验证码看作文件的序列号、 版本号，或者最后发生改变的日期时间。有条件的首部 If-Modified-Since 测试的是文档实例最后被修改的日期时间，因此 我们说最后被修改的日期时间就是验证码。有条件的首部 If-None-Match 测试的 是文档的 ETag 值，它是与实体相关联的一个特殊的关键字，或者说是版本识别标 记。Last-Modified 和 ETag 是 HTTP 使用的两种主要验证码</p>
+<p>请求类型 | 验证码 | 描述<br>—- | —-<br>If-Modified-Since  | Last-Modified | 如果在前一条响应的Last-Modified 首部中说明的时间之后,资源的版本发生变化，就发送其副本<br>If-Unmodified-Since  | Last-Modified  | 仅在前一条响应的Last-Modified首部中说明的时间之后，资源的版本没有变化，才发送其副本<br>If-Match | ETag  | 如果实体的标记与前一次响应首部中的ETag相同，就发送该资源的副本<br>If-None-Match  | ETag | 如果实体的标记与前一次响应首部中的ETag不同，就发送该资源的副本<br>　　HTTP把验证码分为两类：弱验证码（weak validators）和强验证码（strong validators）。弱验证码不一定能唯一标识资源的一个实例，而强验证码必须如此。弱验证码的一个例子是对象的大小字节数。有可能资源的内容改变了，而大小还保持不变，因此假想的字节计数验证码与改变是弱相关的。而资源内容的加密校验和（比如 MD5）就是强验证码，当文档改变时它总是会改变<br>　　最后修改时间被当作弱验证码，因为尽管它说明了资源最后被修改的时间，但它的 描述精度最大就是1秒。因为资源在1秒内可以改变很多次，而且服务器每秒可以处理数千个请求，最后修改日期时间并不总能反应变化情况。ETag首部被当作强验 证码，因为每当资源内容改变时，服务器都可以在ETag首部放置不同的值。版本号和摘要校验和也是很好的ETag首部候选，但它们不能带有任意的文本。ETag首部很灵活，它可以带上任意的文本值（以标记的形式），这样就可以用来设计出各种 各样的客户端和服务器验证策略。服务器可以在标记前面加上“W/”前缀来广播一个“弱”实体标记。对于弱实体标记来说，只有当关联的实体在语义上发生了重大改变时，标记才会变化。而强实体标记则不管关联的实体发生了什么性质的变化，标记都一定会改变。  </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>　　《http权威指南》  </p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://owlsn.github.io/blog/2016/02/25/http%E5%8D%8F%E8%AE%AE%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="http协议学习笔记" target="_blank" rel="external">https://owlsn.github.io/blog/2016/02/25/http协议学习笔记/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/owlsn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/blog/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/owlsn" target="_blank"><span class="text-dark">owlsn</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/blog/2016/02/26/CGI%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="CGI学习笔记"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/blog/2016/02/24/hexo-github%E6%90%AD%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" title="hexo+github搭建自己的个人博客"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/owlsn" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/blog/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/blog/js/plugin.min.js"></script>
+
+
+<script src="/blog/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/blog/',
+        CONTENT_URL: '/blog/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/blog/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
