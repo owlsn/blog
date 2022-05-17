@@ -103,5 +103,5 @@ theme: pure
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: https://github.com/owlsn/blog
+  repo: git@github.com:owlsn/blog
   branch: gh-pages
